@@ -1,1261 +1,1225 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-
-// --- Constants and Configuration ---
-const PAGE_LANDING = 'landing';
-const PAGE_EMERGENCE_LIFE = 'emergence_life';
-const PAGE_EMERGENCE_TRAFFIC = 'emergence_traffic';
-const PAGE_RECOGNITION = 'recognition';
-const PAGE_COORDINATION_SCHELLING = 'coordination_schelling';
-const PAGE_PRF_ASSESSMENT = 'prf_assessment';
-const PAGE_FUNCTIONAL_EQUIVALENCE = 'functional_equivalence';
-const PAGE_CONCLUSION = 'conclusion';
-
-const CELL_SIZE = 10;
-const GRID_COLOR = "#334155";
-const DEAD_COLOR = "#0f172a";
-const ALIVE_COLOR = "#f0f9ff";
-
-// --- Main App Component ---
-export default function App() {
-    const [page, setPage] = useState(PAGE_LANDING);
-
-    const renderPage = () => {
-        switch (page) {
-            case PAGE_EMERGENCE_LIFE:
-                return <GameOfLifeModule />;
-            case PAGE_EMERGENCE_TRAFFIC:
-                return <TrafficSimModule />;
-            case PAGE_RECOGNITION:
-                return <RecognitionModule />;
-            case PAGE_COORDINATION_SCHELLING:
-                return <SchellingModelModule />;
-            case PAGE_PRF_ASSESSMENT:
-                return <PRFAssessmentModule />;
-            case PAGE_FUNCTIONAL_EQUIVALENCE:
-                return <FunctionalEquivalenceModule />;
-            case PAGE_CONCLUSION:
-                return <ConclusionModule />;
-            default:
-                return <LandingPage setPage={setPage} />;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Complexity Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
         }
-    };
+    </style>
+</head>
+<body class="bg-slate-900">
+    <div id="root"></div>
 
-    return (
-        <div className="bg-slate-900 text-slate-200 min-h-screen font-sans">
-            <Header setPage={setPage} currentPage={page} />
-            <main className="p-4 sm:p-6 md:p-8">
-                {renderPage()}
-            </main>
-            <Footer />
-        </div>
-    );
-}
+    <script type="text/babel">
+        const { useState, useEffect, useRef, useCallback } = React;
 
-// --- Layout Components ---
-function Header({ setPage, currentPage }) {
-    const navItems = [
-        { id: PAGE_LANDING, title: 'Home' },
-        { id: PAGE_EMERGENCE_LIFE, title: 'Game of Life' },
-        { id: PAGE_EMERGENCE_TRAFFIC, title: 'Traffic Sim' },
-        { id: PAGE_RECOGNITION, title: 'Recognition' },
-        { id: PAGE_COORDINATION_SCHELLING, title: 'Schelling Model' },
-        { id: PAGE_PRF_ASSESSMENT, title: 'PRF Assessment' },
-        { id: PAGE_FUNCTIONAL_EQUIVALENCE, title: 'Functional Equivalence' },
-        { id: PAGE_CONCLUSION, title: 'The Synthesis' },
-    ];
+        // --- Constants and Configuration ---
+        const PAGE_LANDING = 'landing';
+        const PAGE_EMERGENCE_LIFE = 'emergence_life';
+        const PAGE_EMERGENCE_TRAFFIC = 'emergence_traffic';
+        const PAGE_RECOGNITION = 'recognition';
+        const PAGE_COORDINATION_SCHELLING = 'coordination_schelling';
+        const PAGE_PRF_ASSESSMENT = 'prf_assessment';
+        const PAGE_FUNCTIONAL_EQUIVALENCE = 'functional_equivalence';
+        const PAGE_CONCLUSION = 'conclusion';
 
-    return (
-        <header className="bg-slate-800/50 backdrop-blur-sm sticky top-0 z-50 shadow-lg">
-            <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex flex-col md:flex-row items-center justify-between py-4">
-                    <div className="flex-shrink-0 self-start md:self-center">
-                        <h1 className="text-xl font-bold text-sky-400">Interactive Complexity Explorer</h1>
-                    </div>
-                    <div className="w-full md:w-auto mt-4 md:mt-0">
-                        <div className="md:ml-10 flex items-baseline justify-start md:justify-end flex-wrap gap-x-4 gap-y-2">
-                            {navItems.map(item => (
-                                <button
-                                    key={item.id}
-                                    onClick={() => setPage(item.id)}
-                                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-                                        currentPage === item.id 
-                                        ? 'bg-sky-500 text-white' 
-                                        : 'text-slate-300 hover:bg-slate-700 hover:text-white'
-                                    }`}
-                                >
-                                    {item.title}
-                                </button>
-                            ))}
+        const CELL_SIZE = 10;
+        const GRID_COLOR = "#334155";
+        const DEAD_COLOR = "#0f172a";
+        const ALIVE_COLOR = "#f0f9ff";
+
+        // --- Main App Component ---
+        function App() {
+            const [page, setPage] = useState(PAGE_LANDING);
+
+            const renderPage = () => {
+                switch (page) {
+                    case PAGE_EMERGENCE_LIFE:
+                        return <GameOfLifeModule />;
+                    case PAGE_EMERGENCE_TRAFFIC:
+                        return <TrafficSimModule />;
+                    case PAGE_RECOGNITION:
+                        return <RecognitionModule />;
+                    case PAGE_COORDINATION_SCHELLING:
+                        return <SchellingModelModule />;
+                    case PAGE_PRF_ASSESSMENT:
+                        return <PRFAssessmentModule />;
+                    case PAGE_FUNCTIONAL_EQUIVALENCE:
+                        return <FunctionalEquivalenceModule />;
+                    case PAGE_CONCLUSION:
+                        return <ConclusionModule />;
+                    default:
+                        return <LandingPage setPage={setPage} />;
+                }
+            };
+
+            return (
+                <div className="bg-slate-900 text-slate-200 min-h-screen font-sans">
+                    <Header setPage={setPage} currentPage={page} />
+                    <main className="p-4 sm:p-6 md:p-8">
+                        {renderPage()}
+                    </main>
+                    <Footer />
+                </div>
+            );
+        }
+
+        // --- Layout Components ---
+        function Header({ setPage, currentPage }) {
+            const navItems = [
+                { id: PAGE_LANDING, title: 'Home' },
+                { id: PAGE_EMERGENCE_LIFE, title: 'Game of Life' },
+                { id: PAGE_EMERGENCE_TRAFFIC, title: 'Traffic Sim' },
+                { id: PAGE_RECOGNITION, title: 'Recognition' },
+                { id: PAGE_COORDINATION_SCHELLING, title: 'Schelling Model' },
+                { id: PAGE_PRF_ASSESSMENT, title: 'PRF Assessment' },
+                { id: PAGE_FUNCTIONAL_EQUIVALENCE, title: 'Functional Equivalence' },
+                { id: PAGE_CONCLUSION, title: 'The Synthesis' },
+            ];
+
+            return (
+                <header className="bg-slate-800/50 backdrop-blur-sm sticky top-0 z-50 shadow-lg">
+                    <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="flex flex-col md:flex-row items-center justify-between py-4">
+                            <div className="flex-shrink-0 self-start md:self-center">
+                                <h1 className="text-xl font-bold text-sky-400">Interactive Complexity Explorer</h1>
+                            </div>
+                            <div className="w-full md:w-auto mt-4 md:mt-0">
+                                <div className="md:ml-10 flex items-baseline justify-start md:justify-end flex-wrap gap-x-4 gap-y-2">
+                                    {navItems.map(item => (
+                                        <button
+                                            key={item.id}
+                                            onClick={() => setPage(item.id)}
+                                            className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+                                                currentPage === item.id 
+                                                ? 'bg-sky-500 text-white' 
+                                                : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                                            }`}
+                                        >
+                                            {item.title}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
+                    </nav>
+                </header>
+            );
+        }
+
+        function Footer() {
+            return (
+                <footer className="text-center p-4 text-slate-500 text-xs border-t border-slate-800 mt-12">
+                    <p>Interactive Complexity Explorer | Built for Educational Purposes</p>
+                </footer>
+            );
+        }
+
+
+        function ModuleContainer({ title, description, children }) {
+            return (
+                <div className="container mx-auto">
+                    <div className="text-center mb-8">
+                        <h2 className="text-3xl font-bold tracking-tight text-sky-400 sm:text-4xl">{title}</h2>
+                        <p className="mt-3 max-w-2xl mx-auto text-lg text-slate-400">{description}</p>
+                    </div>
+                    {children}
+                </div>
+            );
+        }
+
+        // --- Page Components ---
+
+        function LandingPage({ setPage }) {
+            return (
+                <div className="container mx-auto text-center py-24">
+                    <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white">
+                        Welcome to the <span className="text-sky-400">Interactive Complexity Explorer</span>
+                    </h1>
+                    <p className="mt-6 max-w-3xl mx-auto text-xl text-slate-300">
+                        An interactive platform for teaching and learning key concepts in complexity. 
+                        Explore emergence, recognition, and coordination through hands-on simulations.
+                    </p>
+                    <div className="mt-10">
+                        <button 
+                            onClick={() => setPage(PAGE_EMERGENCE_LIFE)}
+                            className="bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 px-8 rounded-full text-lg transition-transform transform hover:scale-105"
+                        >
+                            Start the Journey
+                        </button>
                     </div>
                 </div>
-            </nav>
-        </header>
-    );
-}
-
-function Footer() {
-    return (
-        <footer className="text-center p-4 text-slate-500 text-xs border-t border-slate-800 mt-12">
-            <p>Interactive Complexity Explorer | Built for Educational Purposes</p>
-        </footer>
-    );
-}
-
-
-function ModuleContainer({ title, description, children }) {
-    return (
-        <div className="container mx-auto">
-            <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold tracking-tight text-sky-400 sm:text-4xl">{title}</h2>
-                <p className="mt-3 max-w-2xl mx-auto text-lg text-slate-400">{description}</p>
-            </div>
-            {children}
-        </div>
-    );
-}
-
-// --- Page Components ---
-
-function LandingPage({ setPage }) {
-    return (
-        <div className="container mx-auto text-center py-24">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white">
-                Welcome to the <span className="text-sky-400">Interactive Complexity Explorer</span>
-            </h1>
-            <p className="mt-6 max-w-3xl mx-auto text-xl text-slate-300">
-                An interactive platform for teaching and learning key concepts in complexity. 
-                Explore emergence, recognition, and coordination through hands-on simulations.
-            </p>
-            <div className="mt-10">
-                <button 
-                    onClick={() => setPage(PAGE_EMERGENCE_LIFE)}
-                    className="bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 px-8 rounded-full text-lg transition-transform transform hover:scale-105"
-                >
-                    Start the Journey
-                </button>
-            </div>
-        </div>
-    );
-}
-
-// --- Module 1: Game of Life ---
-const GameOfLifeModule = () => {
-    const canvasRef = useRef(null);
-    const [grid, setGrid] = useState(null);
-    const [running, setRunning] = useState(false);
-    const [speed, setSpeed] = useState(100);
-    const [generation, setGeneration] = useState(0);
-    const [dimensions, setDimensions] = useState({ width: 0, height: 0, cols: 0, rows: 0 });
-
-    const initializeGrid = useCallback((cols, rows) => {
-        const newGrid = new Array(cols).fill(null).map(() => new Array(rows).fill(0));
-        setGrid(newGrid);
-        setGeneration(0);
-        return newGrid;
-    }, []);
-
-    const randomizeGrid = useCallback(() => {
-        const { cols, rows } = dimensions;
-        const newGrid = new Array(cols).fill(null)
-            .map(() => new Array(rows).fill(null)
-                .map(() => (Math.random() > 0.8 ? 1 : 0))
             );
-        setGrid(newGrid);
-        setGeneration(0);
-    }, [dimensions]);
-    
-    const loadPattern = (pattern) => {
-        const { cols, rows } = dimensions;
-        const newGrid = initializeGrid(cols, rows);
-        const startCol = Math.floor(cols / 2) - Math.floor(pattern[0].length / 2);
-        const startRow = Math.floor(rows / 2) - Math.floor(pattern.length / 2);
-        pattern.forEach((row, r) => {
-            row.forEach((cell, c) => {
-                if (newGrid[startCol + c] && newGrid[startCol + c][startRow + r] !== undefined) {
-                    newGrid[startCol + c][startRow + r] = cell;
-                }
-            });
-        });
-        setGrid(newGrid);
-        setGeneration(0);
-    };
-
-    const PATTERNS = {
-        glider: [[0,1,0],[0,0,1],[1,1,1]],
-        blinker: [[1,1,1]],
-        toad: [[0,1,1,1], [1,1,1,0]]
-    };
-
-    const drawGrid = useCallback((ctx, currentGrid) => {
-        if (!currentGrid) return;
-        ctx.clearRect(0, 0, dimensions.width, dimensions.height);
-        for (let col = 0; col < dimensions.cols; col++) {
-            for (let row = 0; row < dimensions.rows; row++) {
-                ctx.beginPath();
-                ctx.rect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE);
-                ctx.fillStyle = currentGrid[col][row] ? ALIVE_COLOR : DEAD_COLOR;
-                ctx.fill();
-                ctx.strokeStyle = GRID_COLOR;
-                ctx.stroke();
-            }
         }
-    }, [dimensions]);
 
-    const runSimulation = useCallback(() => {
-        if (!running || !grid) return;
+        // --- Module 1: Game of Life ---
+        const GameOfLifeModule = () => {
+            const canvasRef = useRef(null);
+            const [grid, setGrid] = useState(null);
+            const [running, setRunning] = useState(false);
+            const [speed, setSpeed] = useState(100);
+            const [generation, setGeneration] = useState(0);
+            const [dimensions, setDimensions] = useState({ width: 0, height: 0, cols: 0, rows: 0 });
 
-        setGrid(g => {
-            const nextGrid = JSON.parse(JSON.stringify(g));
-            for (let col = 0; col < dimensions.cols; col++) {
-                for (let row = 0; row < dimensions.rows; row++) {
-                    let neighbors = 0;
-                    for (let i = -1; i < 2; i++) {
-                        for (let j = -1; j < 2; j++) {
-                            if (i === 0 && j === 0) continue;
-                            const x = col + i;
-                            const y = row + j;
-                            if (x >= 0 && y >= 0 && x < dimensions.cols && y < dimensions.rows) {
-                                neighbors += g[x][y];
+            const initializeGrid = useCallback((cols, rows) => {
+                const newGrid = new Array(cols).fill(null).map(() => new Array(rows).fill(0));
+                setGrid(newGrid);
+                setGeneration(0);
+                return newGrid;
+            }, []);
+
+            const randomizeGrid = useCallback(() => {
+                const { cols, rows } = dimensions;
+                const newGrid = new Array(cols).fill(null)
+                    .map(() => new Array(rows).fill(null)
+                        .map(() => (Math.random() > 0.8 ? 1 : 0))
+                    );
+                setGrid(newGrid);
+                setGeneration(0);
+            }, [dimensions]);
+            
+            const loadPattern = (pattern) => {
+                const { cols, rows } = dimensions;
+                const newGrid = initializeGrid(cols, rows);
+                const startCol = Math.floor(cols / 2) - Math.floor(pattern[0].length / 2);
+                const startRow = Math.floor(rows / 2) - Math.floor(pattern.length / 2);
+                pattern.forEach((row, r) => {
+                    row.forEach((cell, c) => {
+                        if (newGrid[startCol + c] && newGrid[startCol + c][startRow + r] !== undefined) {
+                            newGrid[startCol + c][startRow + r] = cell;
+                        }
+                    });
+                });
+                setGrid(newGrid);
+                setGeneration(0);
+            };
+
+            const PATTERNS = {
+                glider: [[0,1,0],[0,0,1],[1,1,1]],
+                blinker: [[1,1,1]],
+                toad: [[0,1,1,1], [1,1,1,0]]
+            };
+
+            const drawGrid = useCallback((ctx, currentGrid) => {
+                if (!currentGrid) return;
+                ctx.clearRect(0, 0, dimensions.width, dimensions.height);
+                for (let col = 0; col < dimensions.cols; col++) {
+                    for (let row = 0; row < dimensions.rows; row++) {
+                        ctx.beginPath();
+                        ctx.rect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+                        ctx.fillStyle = currentGrid[col][row] ? ALIVE_COLOR : DEAD_COLOR;
+                        ctx.fill();
+                        ctx.strokeStyle = GRID_COLOR;
+                        ctx.stroke();
+                    }
+                }
+            }, [dimensions]);
+
+            const runSimulation = useCallback(() => {
+                if (!running || !grid) return;
+
+                setGrid(g => {
+                    const nextGrid = JSON.parse(JSON.stringify(g));
+                    for (let col = 0; col < dimensions.cols; col++) {
+                        for (let row = 0; row < dimensions.rows; row++) {
+                            let neighbors = 0;
+                            for (let i = -1; i < 2; i++) {
+                                for (let j = -1; j < 2; j++) {
+                                    if (i === 0 && j === 0) continue;
+                                    const x = col + i;
+                                    const y = row + j;
+                                    if (x >= 0 && y >= 0 && x < dimensions.cols && y < dimensions.rows) {
+                                        neighbors += g[x][y];
+                                    }
+                                }
+                            }
+
+                            if (g[col][row] === 1 && (neighbors < 2 || neighbors > 3)) {
+                                nextGrid[col][row] = 0;
+                            } else if (g[col][row] === 0 && neighbors === 3) {
+                                nextGrid[col][row] = 1;
                             }
                         }
                     }
-
-                    if (g[col][row] === 1 && (neighbors < 2 || neighbors > 3)) {
-                        nextGrid[col][row] = 0;
-                    } else if (g[col][row] === 0 && neighbors === 3) {
-                        nextGrid[col][row] = 1;
-                    }
-                }
-            }
-            return nextGrid;
-        });
-        setGeneration(g => g + 1);
-    }, [running, grid, dimensions]);
-
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        const container = canvas.parentElement;
-        const width = container.offsetWidth;
-        const height = 500;
-        canvas.width = width;
-        canvas.height = height;
-        const cols = Math.floor(width / CELL_SIZE);
-        const rows = Math.floor(height / CELL_SIZE);
-        setDimensions({ width, height, cols, rows });
-        initializeGrid(cols, rows);
-    }, [initializeGrid]);
-
-    useEffect(() => {
-        const ctx = canvasRef.current.getContext('2d');
-        drawGrid(ctx, grid);
-    }, [grid, drawGrid]);
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            runSimulation();
-        }, speed);
-        return () => clearInterval(interval);
-    }, [running, speed, runSimulation]);
-
-    const handleCanvasClick = (e) => {
-        const canvas = canvasRef.current;
-        const rect = canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        const col = Math.floor(x / CELL_SIZE);
-        const row = Math.floor(y / CELL_SIZE);
-
-        if (col >= 0 && row >= 0 && col < dimensions.cols && row < dimensions.rows) {
-            const newGrid = JSON.parse(JSON.stringify(grid));
-            newGrid[col][row] = grid[col][row] ? 0 : 1;
-            setGrid(newGrid);
-        }
-    };
-
-    return (
-        <ModuleContainer
-            title="Module 1: Emergence in Conway's Game of Life"
-            description="Observe complex, life-like patterns emerge from a few simple rules. Click cells to bring them to life or use presets, then run the simulation."
-        >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="md:col-span-2 bg-slate-800 rounded-lg shadow-xl p-4">
-                     <canvas
-                        ref={canvasRef}
-                        onClick={handleCanvasClick}
-                        className="w-full h-full bg-slate-900 rounded-md cursor-pointer"
-                    />
-                </div>
-                <div className="flex flex-col space-y-4">
-                    <div className="bg-slate-800 rounded-lg shadow-xl p-4">
-                        <h3 className="font-bold text-lg mb-2 text-sky-400">Controls</h3>
-                        <div className="space-y-3">
-                           <button onClick={() => setRunning(!running)} className="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-4 rounded">{running ? 'Pause' : 'Run'}</button>
-                           <button onClick={() => { setRunning(false); runSimulation(); }} className="w-full bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded">Step</button>
-                           <button onClick={randomizeGrid} className="w-full bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded">Randomize</button>
-                           <button onClick={() => initializeGrid(dimensions.cols, dimensions.rows)} className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">Clear</button>
-                        </div>
-                        <div className="mt-4">
-                            <label htmlFor="speed" className="block text-sm font-medium">Speed: {200 - speed}ms</label>
-                            <input type="range" id="speed" min="10" max="200" value={speed} onChange={e => setSpeed(e.target.value)} className="w-full"/>
-                        </div>
-                        <p className="mt-2 text-center">Generation: {generation}</p>
-                    </div>
-                     <div className="bg-slate-800 rounded-lg shadow-xl p-4">
-                        <h3 className="font-bold text-lg mb-2 text-sky-400">Load Pattern</h3>
-                        <div className="space-y-2">
-                           <button onClick={() => loadPattern(PATTERNS.glider)} className="w-full bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded">Glider</button>
-                           <button onClick={() => loadPattern(PATTERNS.blinker)} className="w-full bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded">Blinker</button>
-                           <button onClick={() => loadPattern(PATTERNS.toad)} className="w-full bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded">Toad</button>
-                        </div>
-                    </div>
-                    <div className="bg-slate-800 rounded-lg shadow-xl p-4">
-                        <h3 className="font-bold text-lg mb-2 text-sky-400">Pedagogical Prompts</h3>
-                        <ul className="list-disc list-inside text-sm space-y-2 text-slate-400">
-                           <li>Notice how stable or moving patterns (like the "glider") emerge and sustain themselves.</li>
-                           <li>Who programmed the glider to move? Nobody. Its "behavior" is an emergent property of the simple rules.</li>
-                           <li>What does this tell us about complex systems in the real world?</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </ModuleContainer>
-    );
-};
-
-
-// --- Module 1: Traffic Simulation (Overhauled) ---
-const TrafficSimModule = () => {
-    const canvasRef = useRef(null);
-    const graphCanvasRef = useRef(null);
-    const [cars, setCars] = useState([]);
-    const [numCars, setNumCars] = useState(80);
-    const [maxSpeed, setMaxSpeed] = useState(2.5);
-    const [running, setRunning] = useState(true);
-    const [highlightJams, setHighlightJams] = useState(true);
-    const [notification, setNotification] = useState('');
-    const speedHistory = useRef([]);
-    
-    // AI Tutor State
-    const [tutorQuestionIndex, setTutorQuestionIndex] = useState(0);
-    const [tutorAnswerVisible, setTutorAnswerVisible] = useState(false);
-
-    const tutorQuestions = [
-        {
-            question: "What is a 'phantom' traffic jam?",
-            answer: "It's a jam that forms spontaneously from the collective interactions of drivers, without any central cause like an accident. Each driver reacts only to the car in front, but this simple local rule leads to a complex global pattern."
-        },
-        {
-            question: "What do you predict will happen if you add an 'Aggressive Driver'?",
-            answer: "An aggressive driver (tailgating, braking hard) creates a sharp disruption. This small disturbance ripples backward, often triggering a full-blown jam as other drivers are forced to over-correct. Watch the 'Average Speed' graph plunge when you add one."
-        },
-        {
-            question: "Why does the jam itself sometimes seem to move backward?",
-            answer: "The jam is a wave of 'slowness' moving through the cars. As a car enters the jam from the front, it slows down. As it leaves the back of the jam, it speeds up. The 'wave' of slowness propagates backward, opposite to the direction of traffic."
-        },
-        {
-            question: "How does this relate to other complex systems?",
-            answer: "This principle of 'emergence' from simple rules applies everywhere: stock market fluctuations, bird flocking patterns, and even social dynamics. The system's behavior is more than the sum of its parts."
-        }
-    ];
-
-    const handleNextQuestion = () => {
-        setTutorAnswerVisible(false);
-        setTutorQuestionIndex((prevIndex) => (prevIndex + 1) % tutorQuestions.length);
-    };
-
-
-    const addAggressiveDriver = () => {
-        setCars(currentCars => {
-            const nonAggressiveCars = currentCars.map(c => ({...c, isAggressive: false}));
-            if (nonAggressiveCars.length > 0) {
-                const randomIndex = Math.floor(Math.random() * nonAggressiveCars.length);
-                nonAggressiveCars[randomIndex].isAggressive = true;
-                setNotification('Aggressive Driver Added! Watch the ripple effect.');
-                setTimeout(() => setNotification(''), 3000);
-            }
-            return nonAggressiveCars;
-        });
-    };
-
-    const initializeCars = useCallback((count) => {
-        const newCars = [];
-        for (let i = 0; i < count; i++) {
-            const angle = (i / count) * 2 * Math.PI;
-            newCars.push({
-                angle: angle,
-                speed: Math.random() * maxSpeed,
-                isAggressive: false,
-            });
-        }
-        setCars(newCars);
-        speedHistory.current = [];
-    }, [maxSpeed]);
-    
-    useEffect(() => {
-        initializeCars(numCars);
-    }, [numCars, initializeCars]);
-
-    useEffect(() => {
-        if (!running) return;
-        
-        const animationFrame = requestAnimationFrame(() => {
-            const canvas = canvasRef.current;
-            if(!canvas) return;
-            const ctx = canvas.getContext('2d');
-            const graphCtx = graphCanvasRef.current.getContext('2d');
-            
-            canvas.width = canvas.offsetWidth;
-            canvas.height = 400;
-
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
-            const radius = Math.min(centerX, centerY) * 0.8;
-            
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Draw road
-            ctx.strokeStyle = '#475569';
-            ctx.lineWidth = 20;
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-            ctx.stroke();
-            
-            let totalSpeed = 0;
-
-            const updatedCars = cars.map((car, i) => {
-                const nextCarIndex = (i + 1) % cars.length;
-                const nextCar = cars[nextCarIndex];
-                let distance = nextCar.angle - car.angle;
-                if(distance < 0) distance += 2 * Math.PI;
-                let newSpeed = car.speed;
-                const carMaxSpeed = car.isAggressive ? maxSpeed * 1.2 : maxSpeed;
-                const safeDistance = car.isAggressive ? 0.25 : 0.3; 
-                
-                if (distance < safeDistance) {
-                    newSpeed = Math.max(0, newSpeed - (car.isAggressive ? 0.3 : 0.2));
-                } else {
-                    newSpeed = Math.min(carMaxSpeed, newSpeed + 0.02);
-                }
-                totalSpeed += newSpeed;
-                const newAngle = (car.angle + (newSpeed / radius) * 1.5) % (2 * Math.PI);
-                return { ...car, angle: newAngle, speed: newSpeed };
-            });
-            
-            if(highlightJams) {
-                updatedCars.forEach(car => {
-                    if (car.speed < maxSpeed * 0.3) {
-                        ctx.beginPath();
-                        ctx.strokeStyle = "rgba(234, 179, 8, 0.2)";
-                        ctx.lineWidth = 22;
-                        ctx.arc(centerX, centerY, radius, car.angle - 0.08, car.angle + 0.08);
-                        ctx.stroke();
-                    }
+                    return nextGrid;
                 });
-            }
-            setCars(updatedCars);
+                setGeneration(g => g + 1);
+            }, [running, grid, dimensions]);
 
-            updatedCars.forEach(car => {
-                const x = centerX + radius * Math.cos(car.angle);
-                const y = centerY + radius * Math.sin(car.angle);
-                if (car.isAggressive) {
-                    ctx.fillStyle = '#db2777';
-                } else {
-                    const speedRatio = car.speed / maxSpeed;
-                    const red = Math.round(255 * (1 - speedRatio));
-                    const green = Math.round(255 * speedRatio);
-                    ctx.fillStyle = `rgb(${red}, ${green}, 0)`;
+            useEffect(() => {
+                const canvas = canvasRef.current;
+                const container = canvas.parentElement;
+                const width = container.offsetWidth;
+                const height = 500;
+                canvas.width = width;
+                canvas.height = height;
+                const cols = Math.floor(width / CELL_SIZE);
+                const rows = Math.floor(height / CELL_SIZE);
+                setDimensions({ width, height, cols, rows });
+                initializeGrid(cols, rows);
+            }, [initializeGrid]);
+
+            useEffect(() => {
+                const ctx = canvasRef.current.getContext('2d');
+                drawGrid(ctx, grid);
+            }, [grid, drawGrid]);
+
+            useEffect(() => {
+                const interval = setInterval(() => {
+                    if(running) {
+                        runSimulation();
+                    }
+                }, speed);
+                return () => clearInterval(interval);
+            }, [running, speed, runSimulation]);
+
+            const handleCanvasClick = (e) => {
+                const canvas = canvasRef.current;
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const col = Math.floor(x / CELL_SIZE);
+                const row = Math.floor(y / CELL_SIZE);
+
+                if (col >= 0 && row >= 0 && col < dimensions.cols && row < dimensions.rows) {
+                    const newGrid = JSON.parse(JSON.stringify(grid));
+                    newGrid[col][row] = grid[col][row] ? 0 : 1;
+                    setGrid(newGrid);
                 }
-                ctx.beginPath();
-                ctx.arc(x, y, 5, 0, 2 * Math.PI);
-                ctx.fill();
-            });
+            };
 
-            const avgSpeed = totalSpeed / (cars.length || 1);
-            speedHistory.current.push(avgSpeed);
-            if(speedHistory.current.length > 200) speedHistory.current.shift();
-            
-            graphCtx.clearRect(0,0, graphCanvasRef.current.width, graphCanvasRef.current.height);
-            graphCtx.strokeStyle = '#38bdf8';
-            graphCtx.lineWidth = 2;
-            graphCtx.beginPath();
-            speedHistory.current.forEach((speed, index) => {
-                const x = (index / 200) * graphCanvasRef.current.width;
-                const y = graphCanvasRef.current.height * (1 - (speed / maxSpeed));
-                if(index === 0) graphCtx.moveTo(x,y); else graphCtx.lineTo(x,y);
-            });
-            graphCtx.stroke();
-        });
-        return () => cancelAnimationFrame(animationFrame);
-    }, [cars, running, maxSpeed, highlightJams]);
-
-    const avgSpeed = cars.reduce((acc, car) => acc + car.speed, 0) / (cars.length || 1);
-
-    return (
-        <ModuleContainer
-            title="Module 1: Emergence in Traffic Flow"
-            description="Observe how 'phantom' traffic jams emerge without any central cause, like a crash or obstacle. Use the tools to see the jam form."
-        >
-             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="md:col-span-2 bg-slate-800 rounded-lg shadow-xl p-4 relative">
-                     <canvas ref={canvasRef} className="w-full bg-slate-900 rounded-md" />
-                     {notification && (
-                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/50 text-white px-4 py-2 rounded-lg text-lg font-bold animate-pulse">
-                            {notification}
-                         </div>
-                     )}
-                     <div className="mt-4">
-                        <h4 className="text-sm font-bold text-slate-400 mb-1">Average Speed Over Time</h4>
-                        <canvas ref={graphCanvasRef} width="600" height="80" className="w-full h-20 bg-slate-900 rounded-md"/>
-                     </div>
-                </div>
-                <div className="flex flex-col space-y-4">
-                     <div className="bg-slate-800 rounded-lg shadow-xl p-4">
-                        <h3 className="font-bold text-lg mb-2 text-sky-400">Controls</h3>
-                        <div className="space-y-3">
-                           <button onClick={() => setRunning(!running)} className="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-4 rounded">{running ? 'Pause' : 'Run'}</button>
-                           <button onClick={() => setHighlightJams(!highlightJams)} className={`w-full font-bold py-2 px-4 rounded transition-colors ${highlightJams ? 'bg-amber-500 hover:bg-amber-600' : 'bg-slate-600 hover:bg-slate-700'}`}>{highlightJams ? 'Jam Highlighting: ON' : 'Jam Highlighting: OFF'}</button>
-                           <button onClick={addAggressiveDriver} className="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded">Add Aggressive Driver</button>
-                           <div>
-                                <label htmlFor="numCars" className="block text-sm font-medium">Car Density: {numCars}</label>
-                                <input type="range" id="numCars" min="10" max="150" value={numCars} onChange={e => setNumCars(parseInt(e.target.value))} className="w-full"/>
-                           </div>
-                           <div>
-                                <label htmlFor="maxSpeed" className="block text-sm font-medium">Max Speed: {maxSpeed.toFixed(1)}</label>
-                                <input type="range" id="maxSpeed" min="1.0" max="5" step="0.1" value={maxSpeed} onChange={e => setMaxSpeed(parseFloat(e.target.value))} className="w-full"/>
-                           </div>
+            return (
+                <ModuleContainer
+                    title="Module 1: Emergence in Conway's Game of Life"
+                    description="Observe complex, life-like patterns emerge from a few simple rules. Click cells to bring them to life or use presets, then run the simulation."
+                >
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="md:col-span-2 bg-slate-800 rounded-lg shadow-xl p-4">
+                             <canvas
+                                ref={canvasRef}
+                                onClick={handleCanvasClick}
+                                className="w-full h-full bg-slate-900 rounded-md cursor-pointer"
+                            />
                         </div>
-                        <p className="mt-4 text-center">Current Average Speed: {avgSpeed.toFixed(2)}</p>
-                     </div>
-                     <div className="bg-slate-800 rounded-lg shadow-xl p-4">
-                        <h3 className="font-bold text-lg mb-2 text-sky-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
-                            AI Tutor
-                        </h3>
-                        <div className="mt-4 text-sm text-slate-300">
-                           <p className="font-semibold">{tutorQuestions[tutorQuestionIndex].question}</p>
-                           {tutorAnswerVisible ? (
-                               <p className="mt-2 p-3 bg-slate-700/50 rounded-lg text-slate-400">{tutorQuestions[tutorQuestionIndex].answer}</p>
-                           ) : (
-                               <button onClick={() => setTutorAnswerVisible(true)} className="mt-2 text-sky-400 hover:text-sky-300 font-semibold">Reveal Explanation &raquo;</button>
-                           )}
+                        <div className="flex flex-col space-y-4">
+                            <div className="bg-slate-800 rounded-lg shadow-xl p-4">
+                                <h3 className="font-bold text-lg mb-2 text-sky-400">Controls</h3>
+                                <div className="space-y-3">
+                                   <button onClick={() => setRunning(!running)} className="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-4 rounded">{running ? 'Pause' : 'Run'}</button>
+                                   <button onClick={() => { setRunning(false); runSimulation(); }} className="w-full bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded">Step</button>
+                                   <button onClick={randomizeGrid} className="w-full bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded">Randomize</button>
+                                   <button onClick={() => initializeGrid(dimensions.cols, dimensions.rows)} className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">Clear</button>
+                                </div>
+                                <div className="mt-4">
+                                    <label htmlFor="speed" className="block text-sm font-medium">Speed: {200 - speed}ms</label>
+                                    <input type="range" id="speed" min="10" max="200" value={speed} onChange={e => setSpeed(e.target.value)} className="w-full"/>
+                                </div>
+                                <p className="mt-2 text-center">Generation: {generation}</p>
+                            </div>
+                             <div className="bg-slate-800 rounded-lg shadow-xl p-4">
+                                <h3 className="font-bold text-lg mb-2 text-sky-400">Load Pattern</h3>
+                                <div className="space-y-2">
+                                   <button onClick={() => loadPattern(PATTERNS.glider)} className="w-full bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded">Glider</button>
+                                   <button onClick={() => loadPattern(PATTERNS.blinker)} className="w-full bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded">Blinker</button>
+                                   <button onClick={() => loadPattern(PATTERNS.toad)} className="w-full bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded">Toad</button>
+                                </div>
+                            </div>
+                            <div className="bg-slate-800 rounded-lg shadow-xl p-4">
+                                <h3 className="font-bold text-lg mb-2 text-sky-400">Pedagogical Prompts</h3>
+                                <ul className="list-disc list-inside text-sm space-y-2 text-slate-400">
+                                   <li>Notice how stable or moving patterns (like the "glider") emerge and sustain themselves.</li>
+                                   <li>Who programmed the glider to move? Nobody. Its "behavior" is an emergent property of the simple rules.</li>
+                                   <li>What does this tell us about complex systems in the real world?</li>
+                                </ul>
+                            </div>
                         </div>
-                        <button onClick={handleNextQuestion} className="mt-4 w-full bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded">Next Question</button>
-                     </div>
-                 </div>
-             </div>
-        </ModuleContainer>
-    );
-};
-
-// --- Module 2: Recognition (With Pattern Selection) ---
-
-const RecognitionPatternExercise = ({ pattern, onBack }) => {
-    const canvasRef = useRef(null);
-    const [imageIndex, setImageIndex] = useState(0);
-    const [recognitionPoint, setRecognitionPoint] = useState(null);
-    const [showExplanation, setShowExplanation] = useState(false);
-    const [hintVisible, setHintVisible] = useState(false);
-
-    const signalLevels = [0, 0.1, 0.3, 1.0, 0];
-
-    const drawRecognitionPattern = useCallback(() => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
-        const width = canvas.width;
-        const height = canvas.height;
-        const signal = signalLevels[imageIndex];
-
-        ctx.fillStyle = '#0f172a';
-        ctx.fillRect(0, 0, width, height);
-
-        const totalDots = 8000;
-        ctx.fillStyle = '#f0f9ff';
-
-        for (let i = 0; i < totalDots; i++) {
-            let x, y;
-            if (pattern.points.length > 0 && Math.random() < signal) {
-                const point = pattern.points[Math.floor(Math.random() * pattern.points.length)];
-                x = point.x + (Math.random() - 0.5) * 15;
-                y = point.y + (Math.random() - 0.5) * 15;
-            } else {
-                x = Math.random() * width;
-                y = Math.random() * height;
-            }
-            ctx.fillRect(x, y, 2, 2);
-        }
-        
-        if(hintVisible && pattern.outline){
-            ctx.strokeStyle = "rgba(234, 179, 8, 0.7)";
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(pattern.outline[0].x, pattern.outline[0].y);
-            pattern.outline.forEach(p => ctx.lineTo(p.x, p.y));
-            ctx.closePath();
-            ctx.stroke();
-        }
-    }, [imageIndex, hintVisible, pattern]);
-    
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        const container = canvas.parentElement;
-        canvas.width = container.offsetWidth > 0 ? container.offsetWidth : 600;
-        canvas.height = 400;
-        drawRecognitionPattern();
-    }, [drawRecognitionPattern]);
-
-    const prompts = [
-        "What do you see in this image of random noise?",
-        `Anything yet? A faint pattern of a ${pattern.name.toLowerCase()} is emerging.`,
-        "How about now? Can you make out the shape?",
-        `The pattern is now clear. Do you see the ${pattern.name.toLowerCase()}?`,
-        "Now that you've seen it, can you un-see it? Your brain projects the pattern onto the noise."
-    ];
-    
-    const handleNext = () => { if(imageIndex < signalLevels.length - 1) setImageIndex(i => i + 1); };
-    const handleSeeIt = () => { if (!recognitionPoint) { setRecognitionPoint(imageIndex + 1); setShowExplanation(true); } };
-    const handleReset = () => { setImageIndex(0); setRecognitionPoint(null); setShowExplanation(false); };
-    const showHint = () => {
-        if(!pattern.outline) return;
-        setHintVisible(true);
-        setTimeout(() => setHintVisible(false), 1000);
-    };
-
-    return (
-        <div className="max-w-3xl mx-auto bg-slate-800 rounded-lg shadow-xl p-6">
-            <div className="flex justify-center items-center mb-4">
-                <canvas ref={canvasRef} className="rounded-lg shadow-md w-full h-auto" />
-            </div>
-            <p className="text-center text-lg text-slate-300 mb-4 h-12">{prompts[imageIndex]}</p>
-            <div className="flex justify-center items-center space-x-2 sm:space-x-4">
-                <button onClick={onBack} className="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 sm:px-6 rounded">Back</button>
-                <button onClick={handleReset} className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 sm:px-6 rounded">Reset</button>
-                {imageIndex >= 1 && imageIndex <= 3 && !recognitionPoint && pattern.outline && (
-                    <button onClick={showHint} className="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-4 sm:px-6 rounded">Hint</button>
-                )}
-                 {!recognitionPoint && (
-                    <button onClick={handleSeeIt} className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 sm:px-6 rounded">I see it!</button>
-                )}
-                <button onClick={handleNext} disabled={imageIndex === signalLevels.length - 1} className="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-4 sm:px-6 rounded disabled:bg-slate-600 disabled:cursor-not-allowed">Next</button>
-            </div>
-             {showExplanation && (
-                <div className="mt-6 p-4 bg-slate-700 rounded-lg text-center">
-                    <h3 className="font-bold text-lg text-sky-400">Recognition Event!</h3>
-                    <p className="mt-2 text-slate-300">
-                       You recognized the hidden pattern at stage {recognitionPoint}. This is your "Personal Reality Framework" (PRF) activating. It's the moment your mind organizes ambiguous data into a meaningful whole. Notice how this feels different for different patterns.
-                    </p>
-                </div>
-             )}
-        </div>
-    );
-};
-
-const RecognitionModule = () => {
-    const [selectedPattern, setSelectedPattern] = useState(null);
-
-    const PATTERN_DATA = {
-        dalmatian: {
-            name: "Spotted Dalmatian",
-            description: "A classic example of perceiving a familiar animal.",
-            points: [
-                {x:420,y:188},{x:400,y:195},{x:379,y:203},{x:355,y:210},{x:329,y:215},{x:300,y:218},
-                {x:270,y:220},{x:245,y:219},{x:220,y:215},{x:200,y:210},{x:185,y:200},{x:175,y:185},
-                {x:178,y:170},{x:230,y:280},{x:260,y:285},{x:290,y:288},{x:320,y:285},{x:350,y:280},
-                {x:380,y:275},{x:450,y:150},{x:465,y:148},{x:478,y:155},{x:485,y:170},{x:480,y:185},
-                {x:465,y:195},{x:445,y:190},{x:430,y:180},{x:490,y:175},{x:495,y:178},{x:490,y:182},
-                {x:460,y:145},{x:475,y:135},{x:490,y:140},{x:495,y:155},{x:488,y:165},{x:410,y:200},
-                {x:415,y:220},{x:418,y:250},{x:415,y:280},{x:420,y:300},{x:415,y:300},{x:390,y:200},
-                {x:395,y:220},{x:398,y:250},{x:395,y:280},{x:398,y:300},{x:393,y:300},{x:250,y:220},
-                {x:245,y:250},{x:240,y:280},{x:245,y:310},{x:240,y:310},{x:220,y:220},{x:215,y:250},
-                {x:210,y:280},{x:215,y:310},{x:210,y:310},{x:280,y:250},{x:285,y:252},{x:282,y:248},
-                {x:340,y:240},{x:345,y:242},{x:342,y:238},{x:390,y:230},{x:395,y:232},{x:392,y:228},
-                {x:250,y:200},{x:255,y:202},{x:252,y:198},{x:450,y:170},{x:455,y:172},{x:452,y:168}
-            ],
-            outline: [
-                {x:450,y:150},{x:420,y:188},{x:220,y:215},{x:175,y:185},{x:178,y:170},{x:200,y:210},
-                {x:230,y:280},{x:240,y:310},{x:393,y:300},{x:415,y:300},{x:380,y:275},{x:430,y:180},
-                {x:485,y:170},{x:495,y:178},{x:475,y:135},{x:450,y:150}
-            ]
-        },
-        bicycle: {
-            name: "Hidden Bicycle",
-            description: "An everyday object composed of simple geometric shapes.",
-            points: [
-                ...Array.from({length: 40}, (_, i) => ({ x: 200 + 50 * Math.cos(i*Math.PI/20), y: 300 + 50 * Math.sin(i*Math.PI/20) })), // Left wheel
-                ...Array.from({length: 40}, (_, i) => ({ x: 450 + 50 * Math.cos(i*Math.PI/20), y: 300 + 50 * Math.sin(i*Math.PI/20) })), // Right wheel
-                {x:200,y:300},{x:325,y:300},{x:250,y:200},{x:200,y:300}, // Main frame triangle
-                {x:325,y:300},{x:450,y:300}, // Lower frame
-                {x:250,y:200},{x:300,y:180},{x:350,y:180}, // Handlebars
-                {x:325,y:300},{x:300,y:220}, {x:280,y:210}, {x:320,y:210} // Seat
-            ],
-            outline: [
-                {x:200,y:300},{x:325,y:300},{x:250,y:200},{x:200,y:300},{x:200,y:300},{x:150,y:300},{x:200,y:250},
-                {x:250,y:300},{x:200,y:350},{x:150,y:300},{x:450,y:300},{x:400,y:300},{x:450,y:250},
-                {x:500,y:300},{x:450,y:350},{x:400,y:300},{x:325,y:300},{x:300,y:220},{x:280,y:210},{x:320,y:210},
-                {x:300,y:220},{x:250,y:200},{x:300,y:180},{x:350,y:180}
-            ]
-        },
-        starryNight: {
-            name: "Faint Starry Night",
-            description: "An abstract pattern of swirls and lights.",
-            points: [
-                ...Array.from({length: 80}, () => ({ x: 450 + Math.random()*100, y: 100 + Math.random()*80 })), // Moon/sun
-                ...Array.from({length: 150}, (_,i) => ({ x: 300 + 150*Math.cos(i*Math.PI/20) + Math.random()*50, y: 150 + 80*Math.sin(i*Math.PI/20) + Math.random()*50})), // Swirl
-                ...Array.from({length: 100}, () => ({ x: 100 + Math.random()*20, y: 150 + Math.random()*200 })), // Cypress tree
-                ...Array.from({length: 50}, () => ({ x: 250 + Math.random()*250, y: 350 + Math.random()*30 })) // Village
-            ]
-        }
-    };
-
-    if (selectedPattern) {
-        return <RecognitionPatternExercise pattern={PATTERN_DATA[selectedPattern]} onBack={() => setSelectedPattern(null)} />;
-    }
-
-    return (
-        <ModuleContainer
-            title="Module 2: The Recognition Challenge"
-            description="Our minds are pattern-recognition machines. Choose a pattern below to see how your mind works to find a signal in noisy data."
-        >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-                {Object.entries(PATTERN_DATA).map(([key, pattern]) => (
-                    <div key={key} className="bg-slate-800 p-6 rounded-lg shadow-xl flex flex-col items-center text-center">
-                        <h3 className="text-xl font-bold text-sky-400">{pattern.name}</h3>
-                        <p className="text-sm text-slate-400 mt-2 flex-grow">{pattern.description}</p>
-                        <button onClick={() => setSelectedPattern(key)} className="mt-4 bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-6 rounded">
-                            Select
-                        </button>
                     </div>
-                ))}
-            </div>
-        </ModuleContainer>
-    );
-};
+                </ModuleContainer>
+            );
+        };
 
 
-// --- Module 3: Schelling Segregation Model ---
-const SchellingModelModule = () => {
-    const canvasRef = useRef(null);
-    const [grid, setGrid] = useState([]);
-    const [tolerance, setTolerance] = useState(0.3);
-    const [running, setRunning] = useState(false);
-    const [segregation, setSegregation] = useState(0);
-    const [dimensions, setDimensions] = useState({ width: 0, height: 0, cols: 0, rows: 0 });
+        // --- Module 1: Traffic Simulation (Overhauled) ---
+        const TrafficSimModule = () => {
+            const canvasRef = useRef(null);
+            const graphCanvasRef = useRef(null);
+            const [cars, setCars] = useState([]);
+            const [numCars, setNumCars] = useState(80);
+            const [maxSpeed, setMaxSpeed] = useState(2.5);
+            const [running, setRunning] = useState(true);
+            const [highlightJams, setHighlightJams] = useState(true);
+            const [notification, setNotification] = useState('');
+            const speedHistory = useRef([]);
+            
+            // AI Tutor State
+            const [tutorQuestionIndex, setTutorQuestionIndex] = useState(0);
+            const [tutorAnswerVisible, setTutorAnswerVisible] = useState(false);
 
-    const initializeGrid = useCallback((cols, rows) => {
-        const newGrid = Array(cols).fill(null).map(() => Array(rows).fill(0));
-        let countA = 0;
-        let countB = 0;
-        const totalCells = cols * rows;
-        for (let c = 0; c < cols; c++) {
-            for (let r = 0; r < rows; r++) {
-                const rand = Math.random();
-                if (rand < 0.45 && countA < totalCells * 0.45) {
-                    newGrid[c][r] = 1; // Agent A
-                    countA++;
-                } else if (rand < 0.9 && countB < totalCells * 0.45) {
-                    newGrid[c][r] = 2; // Agent B
-                    countB++;
-                } else {
-                    newGrid[c][r] = 0; // Empty
+            const tutorQuestions = [
+                {
+                    question: "What is a 'phantom' traffic jam?",
+                    answer: "It's a jam that forms spontaneously from the collective interactions of drivers, without any central cause like an accident. Each driver reacts only to the car in front, but this simple local rule leads to a complex global pattern."
+                },
+                {
+                    question: "What do you predict will happen if you add an 'Aggressive Driver'?",
+                    answer: "An aggressive driver (tailgating, braking hard) creates a sharp disruption. This small disturbance ripples backward, often triggering a full-blown jam as other drivers are forced to over-correct. Watch the 'Average Speed' graph plunge when you add one."
+                },
+                {
+                    question: "Why does the jam itself sometimes seem to move backward?",
+                    answer: "The jam is a wave of 'slowness' moving through the cars. As a car enters the jam from the front, it slows down. As it leaves the back of the jam, it speeds up. The 'wave' of slowness propagates backward, opposite to the direction of traffic."
+                },
+                {
+                    question: "How does this relate to other complex systems?",
+                    answer: "This principle of 'emergence' from simple rules applies everywhere: stock market fluctuations, bird flocking patterns, and even social dynamics. The system's behavior is more than the sum of its parts."
                 }
+            ];
+
+            const handleNextQuestion = () => {
+                setTutorAnswerVisible(false);
+                setTutorQuestionIndex((prevIndex) => (prevIndex + 1) % tutorQuestions.length);
+            };
+
+
+            const addAggressiveDriver = () => {
+                setCars(currentCars => {
+                    const nonAggressiveCars = currentCars.map(c => ({...c, isAggressive: false}));
+                    if (nonAggressiveCars.length > 0) {
+                        const randomIndex = Math.floor(Math.random() * nonAggressiveCars.length);
+                        nonAggressiveCars[randomIndex].isAggressive = true;
+                        setNotification('Aggressive Driver Added! Watch the ripple effect.');
+                        setTimeout(() => setNotification(''), 3000);
+                    }
+                    return nonAggressiveCars;
+                });
+            };
+
+            const initializeCars = useCallback((count) => {
+                const newCars = [];
+                for (let i = 0; i < count; i++) {
+                    const angle = (i / count) * 2 * Math.PI;
+                    newCars.push({
+                        angle: angle,
+                        speed: Math.random() * maxSpeed,
+                        isAggressive: false,
+                    });
+                }
+                setCars(newCars);
+                speedHistory.current = [];
+            }, [maxSpeed]);
+            
+            useEffect(() => {
+                initializeCars(numCars);
+            }, [numCars, initializeCars]);
+
+            useEffect(() => {
+                if (!running) return;
+                
+                const animationFrame = requestAnimationFrame(() => {
+                    const canvas = canvasRef.current;
+                    if(!canvas) return;
+                    const ctx = canvas.getContext('2d');
+                    const graphCtx = graphCanvasRef.current.getContext('2d');
+                    
+                    canvas.width = canvas.offsetWidth;
+                    canvas.height = 400;
+
+                    const centerX = canvas.width / 2;
+                    const centerY = canvas.height / 2;
+                    const radius = Math.min(centerX, centerY) * 0.8;
+                    
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                    // Draw road
+                    ctx.strokeStyle = '#475569';
+                    ctx.lineWidth = 20;
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+                    ctx.stroke();
+                    
+                    let totalSpeed = 0;
+
+                    const updatedCars = cars.map((car, i) => {
+                        const nextCarIndex = (i + 1) % cars.length;
+                        const nextCar = cars[nextCarIndex];
+                        let distance = nextCar.angle - car.angle;
+                        if(distance < 0) distance += 2 * Math.PI;
+                        let newSpeed = car.speed;
+                        const carMaxSpeed = car.isAggressive ? maxSpeed * 1.2 : maxSpeed;
+                        const safeDistance = car.isAggressive ? 0.25 : 0.3; 
+                        
+                        if (distance < safeDistance) {
+                            newSpeed = Math.max(0, newSpeed - (car.isAggressive ? 0.3 : 0.2));
+                        } else {
+                            newSpeed = Math.min(carMaxSpeed, newSpeed + 0.02);
+                        }
+                        totalSpeed += newSpeed;
+                        const newAngle = (car.angle + (newSpeed / radius) * 1.5) % (2 * Math.PI);
+                        return { ...car, angle: newAngle, speed: newSpeed };
+                    });
+                    
+                    if(highlightJams) {
+                        updatedCars.forEach(car => {
+                            if (car.speed < maxSpeed * 0.3) {
+                                ctx.beginPath();
+                                ctx.strokeStyle = "rgba(234, 179, 8, 0.2)";
+                                ctx.lineWidth = 22;
+                                ctx.arc(centerX, centerY, radius, car.angle - 0.08, car.angle + 0.08);
+                                ctx.stroke();
+                            }
+                        });
+                    }
+                    setCars(updatedCars);
+
+                    updatedCars.forEach(car => {
+                        const x = centerX + radius * Math.cos(car.angle);
+                        const y = centerY + radius * Math.sin(car.angle);
+                        if (car.isAggressive) {
+                            ctx.fillStyle = '#db2777';
+                        } else {
+                            const speedRatio = car.speed / maxSpeed;
+                            const red = Math.round(255 * (1 - speedRatio));
+                            const green = Math.round(255 * speedRatio);
+                            ctx.fillStyle = `rgb(${red}, ${green}, 0)`;
+                        }
+                        ctx.beginPath();
+                        ctx.arc(x, y, 5, 0, 2 * Math.PI);
+                        ctx.fill();
+                    });
+
+                    const avgSpeed = totalSpeed / (cars.length || 1);
+                    speedHistory.current.push(avgSpeed);
+                    if(speedHistory.current.length > 200) speedHistory.current.shift();
+                    
+                    graphCtx.clearRect(0,0, graphCanvasRef.current.width, graphCanvasRef.current.height);
+                    graphCtx.strokeStyle = '#38bdf8';
+                    graphCtx.lineWidth = 2;
+                    graphCtx.beginPath();
+                    speedHistory.current.forEach((speed, index) => {
+                        const x = (index / 200) * graphCanvasRef.current.width;
+                        const y = graphCanvasRef.current.height * (1 - (speed / maxSpeed));
+                        if(index === 0) graphCtx.moveTo(x,y); else graphCtx.lineTo(x,y);
+                    });
+                    graphCtx.stroke();
+                });
+                return () => cancelAnimationFrame(animationFrame);
+            }, [cars, running, maxSpeed, highlightJams]);
+
+            const avgSpeed = cars.reduce((acc, car) => acc + car.speed, 0) / (cars.length || 1);
+
+            return (
+                <ModuleContainer
+                    title="Module 1: Emergence in Traffic Flow"
+                    description="Observe how 'phantom' traffic jams emerge without any central cause, like a crash or obstacle. Use the tools to see the jam form."
+                >
+                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="md:col-span-2 bg-slate-800 rounded-lg shadow-xl p-4 relative">
+                             <canvas ref={canvasRef} className="w-full bg-slate-900 rounded-md" />
+                             {notification && (
+                                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/50 text-white px-4 py-2 rounded-lg text-lg font-bold animate-pulse">
+                                    {notification}
+                                 </div>
+                             )}
+                             <div className="mt-4">
+                                <h4 className="text-sm font-bold text-slate-400 mb-1">Average Speed Over Time</h4>
+                                <canvas ref={graphCanvasRef} width="600" height="80" className="w-full h-20 bg-slate-900 rounded-md"/>
+                             </div>
+                        </div>
+                        <div className="flex flex-col space-y-4">
+                             <div className="bg-slate-800 rounded-lg shadow-xl p-4">
+                                <h3 className="font-bold text-lg mb-2 text-sky-400">Controls</h3>
+                                <div className="space-y-3">
+                                   <button onClick={() => setRunning(!running)} className="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-4 rounded">{running ? 'Pause' : 'Run'}</button>
+                                   <button onClick={() => setHighlightJams(!highlightJams)} className={`w-full font-bold py-2 px-4 rounded transition-colors ${highlightJams ? 'bg-amber-500 hover:bg-amber-600' : 'bg-slate-600 hover:bg-slate-700'}`}>{highlightJams ? 'Jam Highlighting: ON' : 'Jam Highlighting: OFF'}</button>
+                                   <button onClick={addAggressiveDriver} className="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded">Add Aggressive Driver</button>
+                                   <div>
+                                        <label htmlFor="numCars" className="block text-sm font-medium">Car Density: {numCars}</label>
+                                        <input type="range" id="numCars" min="10" max="150" value={numCars} onChange={e => setNumCars(parseInt(e.target.value))} className="w-full"/>
+                                   </div>
+                                   <div>
+                                        <label htmlFor="maxSpeed" className="block text-sm font-medium">Max Speed: {maxSpeed.toFixed(1)}</label>
+                                        <input type="range" id="maxSpeed" min="1.0" max="5" step="0.1" value={maxSpeed} onChange={e => setMaxSpeed(parseFloat(e.target.value))} className="w-full"/>
+                                   </div>
+                                </div>
+                                <p className="mt-4 text-center">Current Average Speed: {avgSpeed.toFixed(2)}</p>
+                             </div>
+                             <div className="bg-slate-800 rounded-lg shadow-xl p-4">
+                                <h3 className="font-bold text-lg mb-2 text-sky-400">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
+                                    AI Tutor
+                                </h3>
+                                <div className="mt-4 text-sm text-slate-300">
+                                   <p className="font-semibold">{tutorQuestions[tutorQuestionIndex].question}</p>
+                                   {tutorAnswerVisible ? (
+                                       <p className="mt-2 p-3 bg-slate-700/50 rounded-lg text-slate-400">{tutorQuestions[tutorQuestionIndex].answer}</p>
+                                   ) : (
+                                       <button onClick={() => setTutorAnswerVisible(true)} className="mt-2 text-sky-400 hover:text-sky-300 font-semibold">Reveal Explanation &raquo;</button>
+                                   )}
+                                </div>
+                                <button onClick={handleNextQuestion} className="mt-4 w-full bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded">Next Question</button>
+                             </div>
+                         </div>
+                     </div>
+                </ModuleContainer>
+            );
+        };
+
+        // --- Module 2: Recognition (With Pattern Selection) ---
+        const RecognitionPatternExercise = ({ pattern, onBack }) => {
+            const canvasRef = useRef(null);
+            const [imageIndex, setImageIndex] = useState(0);
+            const [recognitionPoint, setRecognitionPoint] = useState(null);
+            const [showExplanation, setShowExplanation] = useState(false);
+            const [hintVisible, setHintVisible] = useState(false);
+
+            const signalLevels = [0, 0.1, 0.3, 1.0, 0];
+
+            const drawRecognitionPattern = useCallback(() => {
+                const canvas = canvasRef.current;
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+                const width = canvas.width;
+                const height = canvas.height;
+                const signal = signalLevels[imageIndex];
+
+                ctx.fillStyle = '#0f172a';
+                ctx.fillRect(0, 0, width, height);
+
+                const totalDots = 8000;
+                ctx.fillStyle = '#f0f9ff';
+
+                for (let i = 0; i < totalDots; i++) {
+                    let x, y;
+                    if (pattern.points.length > 0 && Math.random() < signal) {
+                        const point = pattern.points[Math.floor(Math.random() * pattern.points.length)];
+                        x = point.x + (Math.random() - 0.5) * 15;
+                        y = point.y + (Math.random() - 0.5) * 15;
+                    } else {
+                        x = Math.random() * width;
+                        y = Math.random() * height;
+                    }
+                    ctx.fillRect(x, y, 2, 2);
+                }
+                
+                if(hintVisible && pattern.outline){
+                    ctx.strokeStyle = "rgba(234, 179, 8, 0.7)";
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(pattern.outline[0].x, pattern.outline[0].y);
+                    pattern.outline.forEach(p => ctx.lineTo(p.x, p.y));
+                    ctx.closePath();
+                    ctx.stroke();
+                }
+            }, [imageIndex, hintVisible, pattern]);
+            
+            useEffect(() => {
+                const canvas = canvasRef.current;
+                const container = canvas.parentElement;
+                canvas.width = container.offsetWidth > 0 ? container.offsetWidth : 600;
+                canvas.height = 400;
+                drawRecognitionPattern();
+            }, [drawRecognitionPattern]);
+
+            const prompts = [
+                "What do you see in this image of random noise?",
+                `Anything yet? A faint pattern of a ${pattern.name.toLowerCase()} is emerging.`,
+                "How about now? Can you make out the shape?",
+                `The pattern is now clear. Do you see the ${pattern.name.toLowerCase()}?`,
+                "Now that you've seen it, can you un-see it? Your brain projects the pattern onto the noise."
+            ];
+            
+            const handleNext = () => { if(imageIndex < signalLevels.length - 1) setImageIndex(i => i + 1); };
+            const handleSeeIt = () => { if (!recognitionPoint) { setRecognitionPoint(imageIndex + 1); setShowExplanation(true); } };
+            const handleReset = () => { setImageIndex(0); setRecognitionPoint(null); setShowExplanation(false); };
+            const showHint = () => {
+                if(!pattern.outline) return;
+                setHintVisible(true);
+                setTimeout(() => setHintVisible(false), 1000);
+            };
+
+            return (
+                <div className="max-w-3xl mx-auto bg-slate-800 rounded-lg shadow-xl p-6">
+                    <div className="flex justify-center items-center mb-4">
+                        <canvas ref={canvasRef} className="rounded-lg shadow-md w-full h-auto" />
+                    </div>
+                    <p className="text-center text-lg text-slate-300 mb-4 h-12">{prompts[imageIndex]}</p>
+                    <div className="flex justify-center items-center space-x-2 sm:space-x-4">
+                        <button onClick={onBack} className="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 sm:px-6 rounded">Back</button>
+                        <button onClick={handleReset} className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 sm:px-6 rounded">Reset</button>
+                        {imageIndex >= 1 && imageIndex <= 3 && !recognitionPoint && pattern.outline && (
+                            <button onClick={showHint} className="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-4 sm:px-6 rounded">Hint</button>
+                        )}
+                         {!recognitionPoint && (
+                            <button onClick={handleSeeIt} className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 sm:px-6 rounded">I see it!</button>
+                        )}
+                        <button onClick={handleNext} disabled={imageIndex === signalLevels.length - 1} className="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-4 sm:px-6 rounded disabled:bg-slate-600 disabled:cursor-not-allowed">Next</button>
+                    </div>
+                     {showExplanation && (
+                        <div className="mt-6 p-4 bg-slate-700 rounded-lg text-center">
+                            <h3 className="font-bold text-lg text-sky-400">Recognition Event!</h3>
+                            <p className="mt-2 text-slate-300">
+                               You recognized the hidden pattern at stage {recognitionPoint}. This is your "Personal Reality Framework" (PRF) activating. It's the moment your mind organizes ambiguous data into a meaningful whole. Notice how this feels different for different patterns.
+                            </p>
+                        </div>
+                     )}
+                </div>
+            );
+        };
+
+        const RecognitionModule = () => {
+            const [selectedPattern, setSelectedPattern] = useState(null);
+
+            const PATTERN_DATA = {
+                dalmatian: {
+                    name: "Spotted Dalmatian",
+                    description: "A classic example of perceiving a familiar animal.",
+                    points: [
+                        {x:420,y:188},{x:400,y:195},{x:379,y:203},{x:355,y:210},{x:329,y:215},{x:300,y:218},
+                        {x:270,y:220},{x:245,y:219},{x:220,y:215},{x:200,y:210},{x:185,y:200},{x:175,y:185},
+                        {x:178,y:170},{x:230,y:280},{x:260,y:285},{x:290,y:288},{x:320,y:285},{x:350,y:280},
+                        {x:380,y:275},{x:450,y:150},{x:465,y:148},{x:478,y:155},{x:485,y:170},{x:480,y:185},
+                        {x:465,y:195},{x:445,y:190},{x:430,y:180},{x:490,y:175},{x:495,y:178},{x:490,y:182},
+                        {x:460,y:145},{x:475,y:135},{x:490,y:140},{x:495,y:155},{x:488,y:165},{x:410,y:200},
+                        {x:415,y:220},{x:418,y:250},{x:415,y:280},{x:420,y:300},{x:415,y:300},{x:390,y:200},
+                        {x:395,y:220},{x:398,y:250},{x:395,y:280},{x:398,y:300},{x:393,y:300},{x:250,y:220},
+                        {x:245,y:250},{x:240,y:280},{x:245,y:310},{x:240,y:310},{x:220,y:220},{x:215,y:250},
+                        {x:210,y:280},{x:215,y:310},{x:210,y:310},{x:280,y:250},{x:285,y:252},{x:282,y:248},
+                        {x:340,y:240},{x:345,y:242},{x:342,y:238},{x:390,y:230},{x:395,y:232},{x:392,y:228},
+                        {x:250,y:200},{x:255,y:202},{x:252,y:198},{x:450,y:170},{x:455,y:172},{x:452,y:168}
+                    ],
+                    outline: [
+                        {x:450,y:150},{x:420,y:188},{x:220,y:215},{x:175,y:185},{x:178,y:170},{x:200,y:210},
+                        {x:230,y:280},{x:240,y:310},{x:393,y:300},{x:415,y:300},{x:380,y:275},{x:430,y:180},
+                        {x:485,y:170},{x:495,y:178},{x:475,y:135},{x:450,y:150}
+                    ]
+                },
+                bicycle: {
+                    name: "Hidden Bicycle",
+                    description: "An everyday object composed of simple geometric shapes.",
+                    points: [
+                        ...Array.from({length: 40}, (_, i) => ({ x: 200 + 50 * Math.cos(i*Math.PI/20), y: 300 + 50 * Math.sin(i*Math.PI/20) })), // Left wheel
+                        ...Array.from({length: 40}, (_, i) => ({ x: 450 + 50 * Math.cos(i*Math.PI/20), y: 300 + 50 * Math.sin(i*Math.PI/20) })), // Right wheel
+                        {x:200,y:300},{x:325,y:300},{x:250,y:200},{x:200,y:300}, // Main frame triangle
+                        {x:325,y:300},{x:450,y:300}, // Lower frame
+                        {x:250,y:200},{x:300,y:180},{x:350,y:180}, // Handlebars
+                        {x:325,y:300},{x:300,y:220}, {x:280,y:210}, {x:320,y:210} // Seat
+                    ],
+                    outline: [
+                        {x:200,y:300},{x:325,y:300},{x:250,y:200},{x:200,y:300},{x:200,y:300},{x:150,y:300},{x:200,y:250},
+                        {x:250,y:300},{x:200,y:350},{x:150,y:300},{x:450,y:300},{x:400,y:300},{x:450,y:250},
+                        {x:500,y:300},{x:450,y:350},{x:400,y:300},{x:325,y:300},{x:300,y:220},{x:280,y:210},{x:320,y:210},
+                        {x:300,y:220},{x:250,y:200},{x:300,y:180},{x:350,y:180}
+                    ]
+                },
+                starryNight: {
+                    name: "Faint Starry Night",
+                    description: "An abstract pattern of swirls and lights.",
+                    points: [
+                        ...Array.from({length: 80}, () => ({ x: 450 + Math.random()*100, y: 100 + Math.random()*80 })), // Moon/sun
+                        ...Array.from({length: 150}, (_,i) => ({ x: 300 + 150*Math.cos(i*Math.PI/20) + Math.random()*50, y: 150 + 80*Math.sin(i*Math.PI/20) + Math.random()*50})), // Swirl
+                        ...Array.from({length: 100}, () => ({ x: 100 + Math.random()*20, y: 150 + Math.random()*200 })), // Cypress tree
+                        ...Array.from({length: 50}, () => ({ x: 250 + Math.random()*250, y: 350 + Math.random()*30 })) // Village
+                    ]
+                }
+            };
+
+            if (selectedPattern) {
+                return <RecognitionPatternExercise pattern={PATTERN_DATA[selectedPattern]} onBack={() => setSelectedPattern(null)} />;
             }
-        }
-        setGrid(newGrid);
-        return newGrid;
-    }, []);
 
-    const calculateSegregation = useCallback((currentGrid) => {
-        if (!currentGrid.length) return 0;
-        let similarNeighbors = 0;
-        let totalNeighbors = 0;
-        const cols = currentGrid.length;
-        const rows = currentGrid[0].length;
+            return (
+                <ModuleContainer
+                    title="Module 2: The Recognition Challenge"
+                    description="Our minds are pattern-recognition machines. Choose a pattern below to see how your mind works to find a signal in noisy data."
+                >
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                        {Object.entries(PATTERN_DATA).map(([key, pattern]) => (
+                            <div key={key} className="bg-slate-800 p-6 rounded-lg shadow-xl flex flex-col items-center text-center">
+                                <h3 className="text-xl font-bold text-sky-400">{pattern.name}</h3>
+                                <p className="text-sm text-slate-400 mt-2 flex-grow">{pattern.description}</p>
+                                <button onClick={() => setSelectedPattern(key)} className="mt-4 bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-6 rounded">
+                                    Select
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                </ModuleContainer>
+            );
+        };
 
-        for (let c = 0; c < cols; c++) {
-            for (let r = 0; r < rows; r++) {
-                const agentType = currentGrid[c][r];
-                if (agentType === 0) continue;
 
-                for (let i = -1; i <= 1; i++) {
-                    for (let j = -1; j <= 1; j++) {
-                        if (i === 0 && j === 0) continue;
-                        const nc = c + i;
-                        const nr = r + j;
-                        if (nc >= 0 && nc < cols && nr >= 0 && nr < rows) {
-                            const neighborType = currentGrid[nc][nr];
-                            if (neighborType !== 0) {
-                                totalNeighbors++;
-                                if (neighborType === agentType) {
-                                    similarNeighbors++;
+        // --- Module 3: Schelling Segregation Model ---
+        const SchellingModelModule = () => {
+            const canvasRef = useRef(null);
+            const [grid, setGrid] = useState([]);
+            const [tolerance, setTolerance] = useState(0.3);
+            const [running, setRunning] = useState(false);
+            const [segregation, setSegregation] = useState(0);
+            const [dimensions, setDimensions] = useState({ width: 0, height: 0, cols: 0, rows: 0 });
+
+            const initializeGrid = useCallback((cols, rows) => {
+                const newGrid = Array(cols).fill(null).map(() => Array(rows).fill(0));
+                let countA = 0;
+                let countB = 0;
+                const totalCells = cols * rows;
+                for (let c = 0; c < cols; c++) {
+                    for (let r = 0; r < rows; r++) {
+                        const rand = Math.random();
+                        if (rand < 0.45 && countA < totalCells * 0.45) {
+                            newGrid[c][r] = 1; // Agent A
+                            countA++;
+                        } else if (rand < 0.9 && countB < totalCells * 0.45) {
+                            newGrid[c][r] = 2; // Agent B
+                            countB++;
+                        } else {
+                            newGrid[c][r] = 0; // Empty
+                        }
+                    }
+                }
+                setGrid(newGrid);
+                return newGrid;
+            }, []);
+
+            const calculateSegregation = useCallback((currentGrid) => {
+                if (!currentGrid.length) return 0;
+                let similarNeighbors = 0;
+                let totalNeighbors = 0;
+                const cols = currentGrid.length;
+                const rows = currentGrid[0].length;
+
+                for (let c = 0; c < cols; c++) {
+                    for (let r = 0; r < rows; r++) {
+                        const agentType = currentGrid[c][r];
+                        if (agentType === 0) continue;
+
+                        for (let i = -1; i <= 1; i++) {
+                            for (let j = -1; j <= 1; j++) {
+                                if (i === 0 && j === 0) continue;
+                                const nc = c + i;
+                                const nr = r + j;
+                                if (nc >= 0 && nc < cols && nr >= 0 && nr < rows) {
+                                    const neighborType = currentGrid[nc][nr];
+                                    if (neighborType !== 0) {
+                                        totalNeighbors++;
+                                        if (neighborType === agentType) {
+                                            similarNeighbors++;
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
-        }
-        setSegregation(totalNeighbors === 0 ? 0 : similarNeighbors / totalNeighbors);
-    }, []);
+                setSegregation(totalNeighbors === 0 ? 0 : similarNeighbors / totalNeighbors);
+            }, []);
 
-    const stepSimulation = useCallback(() => {
-        if (!grid.length) return;
-        const { cols, rows } = dimensions;
-        let unsatisfied = [];
-        let empty = [];
+            const stepSimulation = useCallback(() => {
+                if (!grid.length) return;
+                const { cols, rows } = dimensions;
+                let unsatisfied = [];
+                let empty = [];
 
-        for (let c = 0; c < cols; c++) {
-            for (let r = 0; r < rows; r++) {
-                const agentType = grid[c][r];
-                if (agentType === 0) {
-                    empty.push({c, r});
-                    continue;
-                }
+                for (let c = 0; c < cols; c++) {
+                    for (let r = 0; r < rows; r++) {
+                        const agentType = grid[c][r];
+                        if (agentType === 0) {
+                            empty.push({c, r});
+                            continue;
+                        }
 
-                let same = 0;
-                let different = 0;
-                for (let i = -1; i <= 1; i++) {
-                    for (let j = -1; j <= 1; j++) {
-                        if (i === 0 && j === 0) continue;
-                        const nc = c + i;
-                        const nr = r + j;
-                        if (nc >= 0 && nc < cols && nr >= 0 && nr < rows) {
-                            const neighborType = grid[nc][nr];
-                            if (neighborType === agentType) same++;
-                            else if (neighborType !== 0) different++;
+                        let same = 0;
+                        let different = 0;
+                        for (let i = -1; i <= 1; i++) {
+                            for (let j = -1; j <= 1; j++) {
+                                if (i === 0 && j === 0) continue;
+                                const nc = c + i;
+                                const nr = r + j;
+                                if (nc >= 0 && nc < cols && nr >= 0 && nr < rows) {
+                                    const neighborType = grid[nc][nr];
+                                    if (neighborType === agentType) same++;
+                                    else if (neighborType !== 0) different++;
+                                }
+                            }
+                        }
+                        if (same + different > 0 && same / (same + different) < tolerance) {
+                            unsatisfied.push({c, r});
                         }
                     }
                 }
-                if (same + different > 0 && same / (same + different) < tolerance) {
-                    unsatisfied.push({c, r});
+                
+                if (unsatisfied.length > 0) {
+                    const agentToMove = unsatisfied[Math.floor(Math.random() * unsatisfied.length)];
+                    const emptySpot = empty[Math.floor(Math.random() * empty.length)];
+                    if (emptySpot) {
+                        const newGrid = JSON.parse(JSON.stringify(grid));
+                        newGrid[emptySpot.c][emptySpot.r] = grid[agentToMove.c][agentToMove.r];
+                        newGrid[agentToMove.c][agentToMove.r] = 0;
+                        setGrid(newGrid);
+                    }
+                } else {
+                     setRunning(false);
                 }
-            }
-        }
-        
-        if (unsatisfied.length > 0) {
-            const agentToMove = unsatisfied[Math.floor(Math.random() * unsatisfied.length)];
-            const emptySpot = empty[Math.floor(Math.random() * empty.length)];
-            if (emptySpot) {
-                const newGrid = JSON.parse(JSON.stringify(grid));
-                newGrid[emptySpot.c][emptySpot.r] = grid[agentToMove.c][agentToMove.r];
-                newGrid[agentToMove.c][agentToMove.r] = 0;
-                setGrid(newGrid);
-            }
-        } else {
-             setRunning(false);
-        }
 
-        calculateSegregation(grid);
-    }, [grid, tolerance, dimensions, calculateSegregation]);
+                calculateSegregation(grid);
+            }, [grid, tolerance, dimensions, calculateSegregation]);
 
 
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        const container = canvas.parentElement;
-        const width = container.offsetWidth;
-        const height = 500;
-        canvas.width = width;
-        canvas.height = height;
-        const cols = Math.floor(width / CELL_SIZE);
-        const rows = Math.floor(height / CELL_SIZE);
-        setDimensions({ width, height, cols, rows });
-        initializeGrid(cols, rows);
-    }, [initializeGrid]);
-    
-    useEffect(() => {
-        if (running) {
-            const timer = setTimeout(stepSimulation, 50);
-            return () => clearTimeout(timer);
-        }
-    }, [running, grid, stepSimulation]);
-
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        if (!canvas || !grid.length) return;
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        const colors = ['#0f172a', '#0ea5e9', '#f97316']; // empty, A, B
-        const { cols, rows } = dimensions;
-
-        for (let c = 0; c < cols; c++) {
-            for (let r = 0; r < rows; r++) {
-                ctx.fillStyle = colors[grid[c][r]];
-                ctx.fillRect(c * CELL_SIZE, r * CELL_SIZE, CELL_SIZE, CELL_SIZE);
-            }
-        }
-    }, [grid, dimensions]);
-
-    return (
-        <ModuleContainer
-            title="Module 3: The Coordination Challenge"
-            description="Schelling's segregation model shows how collective separation can emerge even when individuals have a high tolerance for diversity. Adjust the tolerance level and observe."
-        >
-             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="md:col-span-2 bg-slate-800 rounded-lg shadow-xl p-4">
-                     <canvas ref={canvasRef} className="w-full h-full bg-slate-900 rounded-md" />
-                </div>
-                <div className="flex flex-col space-y-4">
-                     <div className="bg-slate-800 rounded-lg shadow-xl p-4">
-                        <h3 className="font-bold text-lg mb-2 text-sky-400">Controls</h3>
-                        <button onClick={() => setRunning(!running)} className="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-4 rounded">{running ? 'Pause' : 'Run'}</button>
-                        <button onClick={() => initializeGrid(dimensions.cols, dimensions.rows)} className="mt-2 w-full bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded">Reset</button>
-                        <div className="mt-4">
-                            <label htmlFor="tolerance" className="block text-sm font-medium">Tolerance: {Math.round(tolerance * 100)}%</label>
-                            <p className="text-xs text-slate-400">Agents move if less than this % of their neighbors are like them.</p>
-                            <input type="range" id="tolerance" min="0" max="1" step="0.05" value={tolerance} onChange={e => setTolerance(parseFloat(e.target.value))} className="w-full"/>
-                        </div>
-                         <p className="mt-4 text-center">Segregation Index: {segregation.toFixed(2)}</p>
-                         <p className="text-xs text-center text-slate-400">(Ratio of similar neighbors to total neighbors)</p>
-                     </div>
-                     <div className="bg-slate-800 rounded-lg shadow-xl p-4">
-                        <h3 className="font-bold text-lg mb-2 text-sky-400">Pedagogical Prompts</h3>
-                        <ul className="list-disc list-inside text-sm space-y-2 text-slate-400">
-                           <li>Even with a tolerance of 50% (meaning agents are happy if half their neighbors are different), significant segregation still emerges. Why?</li>
-                           <li>This is a "micro-motive, macro-behavior" problem. Individual preferences don't neatly scale up to the group outcome.</li>
-                           <li>This isn't about racism; it's about the math of weak preferences. How could this dynamic apply to political polarization or organizational silos?</li>
-                        </ul>
-                     </div>
-                 </div>
-             </div>
-        </ModuleContainer>
-    );
-};
-
-// --- Module 4: PRF Self-Assessment ---
-const PRFAssessmentModule = () => {
-    const [problems, setProblems] = useState(['', '', '']);
-    const [assemblyHistory, setAssemblyHistory] = useState([]);
-    const [convictionDepths, setConvictionDepths] = useState([5, 5, 5]);
-    const [futurePull, setFuturePull] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const [aiFeedback, setAiFeedback] = useState('');
-
-    const updateProblem = (index, value) => {
-        const newProblems = [...problems];
-        newProblems[index] = value;
-        setProblems(newProblems);
-    };
-    
-    const updateConviction = (index, value) => {
-        const newDepths = [...convictionDepths];
-        newDepths[index] = value;
-        setConvictionDepths(newDepths);
-    };
-
-    const addHistoryEvent = () => {
-        setAssemblyHistory([...assemblyHistory, { id: Date.now(), text: '', category: 'Childhood' }]);
-    };
-    
-    const updateHistoryEvent = (id, field, value) => {
-        setAssemblyHistory(assemblyHistory.map(event => event.id === id ? {...event, [field]: value} : event));
-    };
-
-    const experienceCategories = ['Childhood', 'Education', 'Relationships', 'Trauma', 'Peak Experience', 'Cultural Background'];
-
-    const handleGenerateFeedback = async () => {
-        setIsLoading(true);
-        setAiFeedback('');
-
-        const userPrompt = `
-            Please analyze the following components of my Personal Reality Framework (PRF).
-            Act as a compassionate, insightful coach. Your goal is to help me see connections and themes in my own thinking, not to judge or advise.
-            Keep your analysis to a concise paragraph (around 150 words).
-
-            1.  **Core Problems I Recognize:**
-                - ${problems[0] || "(Not specified)"} (Conviction: ${convictionDepths[0]}/10)
-                - ${problems[1] || "(Not specified)"} (Conviction: ${convictionDepths[1]}/10)
-                - ${problems[2] || "(Not specified)"} (Conviction: ${convictionDepths[2]}/10)
-
-            2.  **My Assembly History (Key Life Experiences):**
-                ${assemblyHistory.map(e => `- ${e.text} (${e.category})`).join('\n') || "(No experiences listed)"}
-
-            3.  **My Future Pull (Who I want to become/what world I want to create):**
-                > ${futurePull || "(Not specified)"}
-
-            Based on this, please provide a synthesis. Look for recurring themes, potential connections between my history and my recognitions, and how my future pull might relate to the problems I see. Point out potential patterns without being prescriptive.
-        `;
-        
-        const apiKey = ""; // Leave as-is, will be handled by the environment
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-
-        try {
-             const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: [{ parts: [{ text: userPrompt }] }] })
-            });
-
-            if (!response.ok) {
-                throw new Error(`API call failed with status: ${response.status}`);
-            }
-
-            const result = await response.json();
-            const feedbackText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+            useEffect(() => {
+                const canvas = canvasRef.current;
+                const container = canvas.parentElement;
+                const width = container.offsetWidth;
+                const height = 500;
+                canvas.width = width;
+                canvas.height = height;
+                const cols = Math.floor(width / CELL_SIZE);
+                const rows = Math.floor(height / CELL_SIZE);
+                setDimensions({ width, height, cols, rows });
+                initializeGrid(cols, rows);
+            }, [initializeGrid]);
             
-            if (feedbackText) {
-                setAiFeedback(feedbackText);
-            } else {
-                 setAiFeedback("Sorry, I couldn't generate feedback at this time. The response from the AI was empty.");
-            }
-        } catch (error) {
-            console.error("AI feedback generation error:", error);
-            setAiFeedback("Apologies, but an error occurred while generating feedback. Please check the console for details.");
-        } finally {
-            setIsLoading(false);
-        }
-    };
+            useEffect(() => {
+                if (running) {
+                    const timer = setTimeout(stepSimulation, 50);
+                    return () => clearTimeout(timer);
+                }
+            }, [running, grid, stepSimulation]);
 
-    return (
-        <ModuleContainer
-            title="Module 4: Personal Reality Framework (PRF) Assessment"
-            description="This module introduces core FAIM-QIRF concepts. Use this tool to map your own Personal Reality Framework (PRF) and develop the capacity for 'Operating System 2' (OS2) — the ability to see and reflect on your own PRF."
-        >
-            <div className="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div className="space-y-6">
-                    {/* Section 1: Recognized Problems */}
-                    <div className="bg-slate-800 p-6 rounded-lg shadow-xl">
-                        <h3 className="text-xl font-bold text-sky-400 mb-4">1. What You Recognize</h3>
-                        <p className="text-sm text-slate-400 mb-4">List 3 problems you immediately recognize in the world. (Connects to the Dalmatian exercise).</p>
-                        <div className="space-y-4">
-                            {problems.map((p, i) => (
-                                <input key={i} type="text" value={p} onChange={e => updateProblem(i, e.target.value)} placeholder={`Problem ${i+1}`} className="w-full bg-slate-700 border border-slate-600 rounded-md px-3 py-2 focus:ring-sky-500 focus:border-sky-500"/>
-                            ))}
+            useEffect(() => {
+                const canvas = canvasRef.current;
+                if (!canvas || !grid.length) return;
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                const colors = ['#0f172a', '#0ea5e9', '#f97316']; // empty, A, B
+                const { cols, rows } = dimensions;
+
+                for (let c = 0; c < cols; c++) {
+                    for (let r = 0; r < rows; r++) {
+                        ctx.fillStyle = colors[grid[c][r]];
+                        ctx.fillRect(c * CELL_SIZE, r * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+                    }
+                }
+            }, [grid, dimensions]);
+
+            return (
+                <ModuleContainer
+                    title="Module 3: The Coordination Challenge"
+                    description="Schelling's segregation model shows how collective separation can emerge even when individuals have a high tolerance for diversity. Adjust the tolerance level and observe."
+                >
+                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="md:col-span-2 bg-slate-800 rounded-lg shadow-xl p-4">
+                             <canvas ref={canvasRef} className="w-full h-full bg-slate-900 rounded-md" />
                         </div>
-                    </div>
-
-                    {/* Section 2: Assembly History */}
-                    <div className="bg-slate-800 p-6 rounded-lg shadow-xl">
-                        <h3 className="text-xl font-bold text-sky-400 mb-4">2. Your Assembly History</h3>
-                        <p className="text-sm text-slate-400 mb-4">What life experiences shaped these recognitions?</p>
-                        {assemblyHistory.map(event => (
-                            <div key={event.id} className="flex items-center space-x-2 mb-2">
-                                <input type="text" value={event.text} onChange={e => updateHistoryEvent(event.id, 'text', e.target.value)} placeholder="Life experience..." className="w-full bg-slate-700 border border-slate-600 rounded-md px-3 py-2"/>
-                                <select value={event.category} onChange={e => updateHistoryEvent(event.id, 'category', e.target.value)} className="bg-slate-700 border border-slate-600 rounded-md px-3 py-2">
-                                    {experienceCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-                                </select>
-                            </div>
-                        ))}
-                        <button onClick={addHistoryEvent} className="mt-2 text-sky-400 hover:text-sky-300 font-semibold text-sm">+ Add Experience</button>
-                    </div>
-
-                     {/* Section 3: Conviction Depth */}
-                    <div className="bg-slate-800 p-6 rounded-lg shadow-xl">
-                        <h3 className="text-xl font-bold text-sky-400 mb-4">3. Conviction Depths</h3>
-                        <p className="text-sm text-slate-400 mb-4">Rate how central each belief is to you (0-10).</p>
-                        <div className="space-y-4">
-                           {problems.map((p, i) => (
-                                <div key={i}>
-                                    <label className="block text-sm font-medium truncate">{p || `Problem ${i+1}`}: {convictionDepths[i]}</label>
-                                    <input type="range" min="0" max="10" value={convictionDepths[i]} onChange={e => updateConviction(i, e.target.value)} className="w-full"/>
+                        <div className="flex flex-col space-y-4">
+                             <div className="bg-slate-800 rounded-lg shadow-xl p-4">
+                                <h3 className="font-bold text-lg mb-2 text-sky-400">Controls</h3>
+                                <button onClick={() => setRunning(!running)} className="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-4 rounded">{running ? 'Pause' : 'Run'}</button>
+                                <button onClick={() => initializeGrid(dimensions.cols, dimensions.rows)} className="mt-2 w-full bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded">Reset</button>
+                                <div className="mt-4">
+                                    <label htmlFor="tolerance" className="block text-sm font-medium">Tolerance: {Math.round(tolerance * 100)}%</label>
+                                    <p className="text-xs text-slate-400">Agents move if less than this % of their neighbors are like them.</p>
+                                    <input type="range" id="tolerance" min="0" max="1" step="0.05" value={tolerance} onChange={e => setTolerance(parseFloat(e.target.value))} className="w-full"/>
                                 </div>
-                            ))}
-                        </div>
-                    </div>
-                    
-                    {/* Section 4: Future Pull */}
-                    <div className="bg-slate-800 p-6 rounded-lg shadow-xl">
-                        <h3 className="text-xl font-bold text-sky-400 mb-4">4. Your Future Pull</h3>
-                         <p className="text-sm text-slate-400 mb-4">Who do you want to become? What world do you want to help create?</p>
-                        <textarea value={futurePull} onChange={e => setFuturePull(e.target.value)} rows="4" className="w-full bg-slate-700 border border-slate-600 rounded-md px-3 py-2"></textarea>
-                    </div>
-                </div>
+                                 <p className="mt-4 text-center">Segregation Index: {segregation.toFixed(2)}</p>
+                                 <p className="text-xs text-center text-slate-400">(Ratio of similar neighbors to total neighbors)</p>
+                             </div>
+                             <div className="bg-slate-800 rounded-lg shadow-xl p-4">
+                                <h3 className="font-bold text-lg mb-2 text-sky-400">Pedagogical Prompts</h3>
+                                <ul className="list-disc list-inside text-sm space-y-2 text-slate-400">
+                                   <li>Even with a tolerance of 50% (meaning agents are happy if half their neighbors are different), significant segregation still emerges. Why?</li>
+                                   <li>This is a "micro-motive, macro-behavior" problem. Individual preferences don't neatly scale up to the group outcome.</li>
+                                   <li>This isn't about racism; it's about the math of weak preferences. How could this dynamic apply to political polarization or organizational silos?</li>
+                                </ul>
+                             </div>
+                         </div>
+                     </div>
+                </ModuleContainer>
+            );
+        };
 
-                <div className="space-y-6">
-                    {/* Visualization and AI Feedback */}
-                    <div className="bg-slate-800 p-6 rounded-lg shadow-xl">
-                        <h3 className="text-xl font-bold text-sky-400 mb-4">Your PRF Summary</h3>
-                         {/* Visualization */}
-                        <div className="space-y-4 border-b border-slate-700 pb-4 mb-4">
-                            <h4 className="font-semibold text-slate-300">Core Problems & Convictions</h4>
-                            {problems.map((p, i) => (
-                                <div key={i} className="mt-2">
-                                    <p className="text-sm font-medium">{p || `(Problem ${i+1})`}</p>
-                                    <div className="w-full bg-slate-700 rounded-full h-2.5">
-                                        <div className="bg-sky-500 h-2.5 rounded-full" style={{ width: `${convictionDepths[i] * 10}%` }}></div>
+        // --- Module 4: PRF Self-Assessment ---
+        const PRFAssessmentModule = () => {
+            const [problems, setProblems] = useState(['', '', '']);
+            const [assemblyHistory, setAssemblyHistory] = useState([]);
+            const [convictionDepths, setConvictionDepths] = useState([5, 5, 5]);
+            const [futurePull, setFuturePull] = useState('');
+
+            const updateProblem = (index, value) => {
+                const newProblems = [...problems];
+                newProblems[index] = value;
+                setProblems(newProblems);
+            };
+            
+            const updateConviction = (index, value) => {
+                const newDepths = [...convictionDepths];
+                newDepths[index] = value;
+                setConvictionDepths(newDepths);
+            };
+
+            const addHistoryEvent = () => {
+                setAssemblyHistory([...assemblyHistory, { id: Date.now(), text: '', category: 'Childhood' }]);
+            };
+            
+            const updateHistoryEvent = (id, field, value) => {
+                setAssemblyHistory(assemblyHistory.map(event => event.id === id ? {...event, [field]: value} : event));
+            };
+
+            const experienceCategories = ['Childhood', 'Education', 'Relationships', 'Trauma', 'Peak Experience', 'Cultural Background'];
+
+            return (
+                <ModuleContainer
+                    title="Module 4: Personal Reality Framework (PRF) Assessment"
+                    description="This module introduces core FAIM-QIRF concepts. Use this tool to map your own Personal Reality Framework (PRF) and develop the capacity for 'Operating System 2' (OS2) — the ability to see and reflect on your own PRF."
+                >
+                    <div className="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div className="space-y-6">
+                            {/* Section 1: Recognized Problems */}
+                            <div className="bg-slate-800 p-6 rounded-lg shadow-xl">
+                                <h3 className="text-xl font-bold text-sky-400 mb-4">1. What You Recognize</h3>
+                                <p className="text-sm text-slate-400 mb-4">List 3 problems you immediately recognize in the world. (Connects to the Dalmatian exercise).</p>
+                                <div className="space-y-4">
+                                    {problems.map((p, i) => (
+                                        <input key={i} type="text" value={p} onChange={e => updateProblem(i, e.target.value)} placeholder={`Problem ${i+1}`} className="w-full bg-slate-700 border border-slate-600 rounded-md px-3 py-2 focus:ring-sky-500 focus:border-sky-500"/>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Section 2: Assembly History */}
+                            <div className="bg-slate-800 p-6 rounded-lg shadow-xl">
+                                <h3 className="text-xl font-bold text-sky-400 mb-4">2. Your Assembly History</h3>
+                                <p className="text-sm text-slate-400 mb-4">What life experiences shaped these recognitions?</p>
+                                {assemblyHistory.map(event => (
+                                    <div key={event.id} className="flex items-center space-x-2 mb-2">
+                                        <input type="text" value={event.text} onChange={e => updateHistoryEvent(event.id, 'text', e.target.value)} placeholder="Life experience..." className="w-full bg-slate-700 border border-slate-600 rounded-md px-3 py-2"/>
+                                        <select value={event.category} onChange={e => updateHistoryEvent(event.id, 'category', e.target.value)} className="bg-slate-700 border border-slate-600 rounded-md px-3 py-2">
+                                            {experienceCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                                        </select>
+                                    </div>
+                                ))}
+                                <button onClick={addHistoryEvent} className="mt-2 text-sky-400 hover:text-sky-300 font-semibold text-sm">+ Add Experience</button>
+                            </div>
+
+                             {/* Section 3: Conviction Depth */}
+                            <div className="bg-slate-800 p-6 rounded-lg shadow-xl">
+                                <h3 className="text-xl font-bold text-sky-400 mb-4">3. Conviction Depths</h3>
+                                <p className="text-sm text-slate-400 mb-4">Rate how central each belief is to you (0-10).</p>
+                                <div className="space-y-4">
+                                   {problems.map((p, i) => (
+                                        <div key={i}>
+                                            <label className="block text-sm font-medium truncate">{p || `Problem ${i+1}`}: {convictionDepths[i]}</label>
+                                            <input type="range" min="0" max="10" value={convictionDepths[i]} onChange={e => updateConviction(i, e.target.value)} className="w-full"/>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                            
+                            {/* Section 4: Future Pull */}
+                            <div className="bg-slate-800 p-6 rounded-lg shadow-xl">
+                                <h3 className="text-xl font-bold text-sky-400 mb-4">4. Your Future Pull</h3>
+                                 <p className="text-sm text-slate-400 mb-4">Who do you want to become? What world do you want to help create?</p>
+                                <textarea value={futurePull} onChange={e => setFuturePull(e.target.value)} rows="4" className="w-full bg-slate-700 border border-slate-600 rounded-md px-3 py-2"></textarea>
+                            </div>
+                        </div>
+
+                        <div className="space-y-6">
+                            {/* Visualization */}
+                            <div className="bg-slate-800 p-6 rounded-lg shadow-xl">
+                                <h3 className="text-xl font-bold text-sky-400 mb-4">Your PRF Visualization</h3>
+                                <div className="space-y-4">
+                                    <div>
+                                        <h4 className="font-semibold text-slate-300">Core Problems & Convictions</h4>
+                                        {problems.map((p, i) => (
+                                            <div key={i} className="mt-2">
+                                                <p className="text-sm font-medium">{p || `(Problem ${i+1})`}</p>
+                                                <div className="w-full bg-slate-700 rounded-full h-2.5">
+                                                    <div className="bg-sky-500 h-2.5 rounded-full" style={{ width: `${convictionDepths[i] * 10}%` }}></div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                     <div>
+                                        <h4 className="font-semibold text-slate-300 mt-4">Assembly History</h4>
+                                        <ul className="list-disc list-inside text-sm text-slate-400">
+                                           {assemblyHistory.map(e => <li key={e.id}>{e.text} ({e.category})</li>)}
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <h4 className="font-semibold text-slate-300 mt-4">Future Pull</h4>
+                                        <p className="text-sm text-slate-400 italic">"{futurePull || '...'}"</p>
                                     </div>
                                 </div>
+                            </div>
+                             {/* OS1/OS2 Explanation */}
+                            <div className="bg-slate-800 p-6 rounded-lg shadow-xl">
+                                <h3 className="text-xl font-bold text-sky-400 mb-4">Understanding OS1 & OS2</h3>
+                                <p className="text-sm text-slate-400 space-y-3">
+                                   <span><strong className="text-slate-200">OS1 (Your PRF):</strong> This is your default operating system. It's the collection of recognitions, beliefs, and values you've just mapped. It runs automatically, filtering reality for you. It's fast and efficient, but it's also a bubble.</span>
+                                   <span><strong className="text-slate-200">OS2 (Self-Awareness):</strong> This is the conscious effort to *look at* your OS1, rather than *through* it. By completing this exercise, you are running OS2. It's slower and more deliberate, but it allows you to understand your own biases, see other points of view, and coordinate with people who have different PRFs.</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </ModuleContainer>
+            );
+        };
+
+        // --- Module 5: Functional Equivalence Builder ---
+        const FunctionalEquivalenceModule = () => {
+            const [approach, setApproach] = useState('traditional');
+            const [sharedOutcome, setSharedOutcome] = useState('');
+            const [contributions, setContributions] = useState({ economic: '', justice: '', spiritual: '' });
+
+            const personas = {
+                economic: { name: 'The Economist', recognizes: "Costs, benefits, markets, efficiency", values: "Economic growth, innovation", seesClimate: "An economic challenge requiring market solutions (carbon tax, etc)." },
+                justice: { name: 'The Activist', recognizes: "Inequality, historical harm, vulnerable communities", values: "Equity, fairness, restorative justice", seesClimate: "A social justice crisis disproportionately harming the poor and marginalized." },
+                spiritual: { name: 'The Spiritual Leader', recognizes: "Interconnection, sacredness of nature, moral duty", values: "Stewardship, compassion, reverence for life", seesClimate: "A moral and spiritual failing that requires a shift in consciousness." }
+            };
+            
+            const updateContribution = (persona, value) => {
+                setContributions(prev => ({ ...prev, [persona]: value }));
+            };
+
+            return (
+                <ModuleContainer
+                    title="Module 5: Functional Equivalence Builder"
+                    description="Explore how to coordinate action between groups with different PRFs. Compare a 'Traditional Approach' of debate with a 'Functional Equivalence' approach of building shared outcomes."
+                >
+                    <div className="max-w-6xl mx-auto">
+                        {/* Personas Display */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                            {Object.entries(personas).map(([key, persona]) => (
+                                <div key={key} className="bg-slate-800 p-4 rounded-lg shadow-xl">
+                                    <h4 className="font-bold text-lg text-sky-400">{persona.name}</h4>
+                                    <p className="text-xs mt-2"><strong className="text-slate-300">Recognizes:</strong> {persona.recognizes}</p>
+                                    <p className="text-xs mt-1"><strong className="text-slate-300">Values:</strong> {persona.values}</p>
+                                     <p className="text-xs mt-1"><strong className="text-slate-300">Sees Climate as:</strong> {persona.seesClimate}</p>
+                                </div>
                             ))}
-                            <h4 className="font-semibold text-slate-300 mt-4">Assembly History</h4>
-                            <ul className="list-disc list-inside text-sm text-slate-400">
-                               {assemblyHistory.map(e => <li key={e.id}>{e.text} ({e.category})</li>)}
-                            </ul>
-                            <h4 className="font-semibold text-slate-300 mt-4">Future Pull</h4>
-                            <p className="text-sm text-slate-400 italic">"{futurePull || '...'}"</p>
                         </div>
-                        
-                        {/* AI Feedback Section */}
-                        <div>
-                             <h4 className="font-semibold text-slate-300">AI-Powered Reflection</h4>
-                             <button onClick={handleGenerateFeedback} disabled={isLoading} className="mt-2 w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-600 text-white font-bold py-2 px-4 rounded">
-                                 {isLoading ? 'Analyzing...' : 'Get AI Feedback'}
-                             </button>
-                             {aiFeedback && (
-                                <div className="mt-4 p-4 bg-slate-700/50 rounded-lg">
-                                    <p className="text-sm text-slate-300 whitespace-pre-wrap">{aiFeedback}</p>
-                                </div>
-                             )}
-                        </div>
-                    </div>
-                     {/* OS1/OS2 Explanation */}
-                    <div className="bg-slate-800 p-6 rounded-lg shadow-xl">
-                        <h3 className="text-xl font-bold text-sky-400 mb-4">Understanding OS1 & OS2</h3>
-                        <p className="text-sm text-slate-400 space-y-3">
-                           <span><strong className="text-slate-200">OS1 (Your PRF):</strong> This is your default operating system. It's the collection of recognitions, beliefs, and values you've just mapped. It runs automatically, filtering reality for you. It's fast and efficient, but it's also a bubble.</span>
-                           <span><strong className="text-slate-200">OS2 (Self-Awareness):</strong> This is the conscious effort to *look at* your OS1, rather than *through* it. By completing this exercise, you are running OS2. It's slower and more deliberate, but it allows you to understand your own biases, see other points of view, and coordinate with people who have different PRFs.</span>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </ModuleContainer>
-    );
-};
 
-// --- Module 5: Functional Equivalence Builder ---
-const FunctionalEquivalenceModule = () => {
-    const [approach, setApproach] = useState('traditional');
-    const [sharedOutcome, setSharedOutcome] = useState('');
-    const [contributions, setContributions] = useState({ economic: '', justice: '', spiritual: '' });
-
-    const personas = {
-        economic: { name: 'The Economist', recognizes: "Costs, benefits, markets, efficiency", values: "Economic growth, innovation", seesClimate: "An economic challenge requiring market solutions (carbon tax, etc)." },
-        justice: { name: 'The Activist', recognizes: "Inequality, historical harm, vulnerable communities", values: "Equity, fairness, restorative justice", seesClimate: "A social justice crisis disproportionately harming the poor and marginalized." },
-        spiritual: { name: 'The Spiritual Leader', recognizes: "Interconnection, sacredness of nature, moral duty", values: "Stewardship, compassion, reverence for life", seesClimate: "A moral and spiritual failing that requires a shift in consciousness." }
-    };
-    
-    const updateContribution = (persona, value) => {
-        setContributions(prev => ({ ...prev, [persona]: value }));
-    };
-
-    return (
-        <ModuleContainer
-            title="Module 5: Functional Equivalence Builder"
-            description="Explore how to coordinate action between groups with different PRFs. Compare a 'Traditional Approach' of debate with a 'Functional Equivalence' approach of building shared outcomes."
-        >
-            <div className="max-w-6xl mx-auto">
-                {/* Personas Display */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    {Object.entries(personas).map(([key, persona]) => (
-                        <div key={key} className="bg-slate-800 p-4 rounded-lg shadow-xl">
-                            <h4 className="font-bold text-lg text-sky-400">{persona.name}</h4>
-                            <p className="text-xs mt-2"><strong className="text-slate-300">Recognizes:</strong> {persona.recognizes}</p>
-                            <p className="text-xs mt-1"><strong className="text-slate-300">Values:</strong> {persona.values}</p>
-                             <p className="text-xs mt-1"><strong className="text-slate-300">Sees Climate as:</strong> {persona.seesClimate}</p>
-                        </div>
-                    ))}
-                </div>
-
-                {/* Approach Selector */}
-                <div className="flex justify-center my-8">
-                    <div className="bg-slate-800 p-1 rounded-lg flex space-x-1">
-                        <button onClick={() => setApproach('traditional')} className={`px-4 py-2 text-sm font-semibold rounded-md ${approach === 'traditional' ? 'bg-sky-500 text-white' : 'hover:bg-slate-700'}`}>Traditional Approach</button>
-                        <button onClick={() => setApproach('functional')} className={`px-4 py-2 text-sm font-semibold rounded-md ${approach === 'functional' ? 'bg-sky-500 text-white' : 'hover:bg-slate-700'}`}>Functional Equivalence</button>
-                    </div>
-                </div>
-
-                {/* Content based on approach */}
-                {approach === 'traditional' ? (
-                    <div className="bg-slate-800 p-6 rounded-lg shadow-xl text-center">
-                        <h3 className="text-xl font-bold text-red-500">Outcome: Gridlock & Polarization</h3>
-                        <p className="mt-2 text-slate-400">In the traditional approach, each persona debates to prove their view is the "right" one. They talk past each other because they don't share the same recognition frames or values. The result is conflict, inaction, and increased division, as no single view can encompass the complexity of the problem.</p>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div className="bg-slate-800 p-6 rounded-lg shadow-xl">
-                            <h3 className="text-xl font-bold text-green-500 mb-4">Builder: Find Functional Equivalence</h3>
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="block font-semibold text-slate-300 mb-1">1. Identify a Shared Outcome</label>
-                                    <input type="text" value={sharedOutcome} onChange={e => setSharedOutcome(e.target.value)} placeholder="e.g., A thriving, sustainable world for future generations" className="w-full bg-slate-700 border border-slate-600 rounded-md px-3 py-2"/>
-                                </div>
-                                <div>
-                                    <label className="block font-semibold text-slate-300 mb-1">2. Map Each PRF's Contribution</label>
-                                    <p className="text-xs text-slate-400 mb-2">How can each group contribute to the shared outcome *from within their own worldview*?</p>
-                                    <textarea value={contributions.economic} onChange={e => updateContribution('economic', e.target.value)} rows="2" placeholder={`${personas.economic.name} can contribute by...`} className="w-full bg-slate-700 border border-slate-600 rounded-md px-3 py-2 mb-2"></textarea>
-                                    <textarea value={contributions.justice} onChange={e => updateContribution('justice', e.target.value)} rows="2" placeholder={`${personas.justice.name} can contribute by...`} className="w-full bg-slate-700 border border-slate-600 rounded-md px-3 py-2 mb-2"></textarea>
-                                    <textarea value={contributions.spiritual} onChange={e => updateContribution('spiritual', e.target.value)} rows="2" placeholder={`${personas.spiritual.name} can contribute by...`} className="w-full bg-slate-700 border border-slate-600 rounded-md px-3 py-2"></textarea>
-                                </div>
+                        {/* Approach Selector */}
+                        <div className="flex justify-center my-8">
+                            <div className="bg-slate-800 p-1 rounded-lg flex space-x-1">
+                                <button onClick={() => setApproach('traditional')} className={`px-4 py-2 text-sm font-semibold rounded-md ${approach === 'traditional' ? 'bg-sky-500 text-white' : 'hover:bg-slate-700'}`}>Traditional Approach</button>
+                                <button onClick={() => setApproach('functional')} className={`px-4 py-2 text-sm font-semibold rounded-md ${approach === 'functional' ? 'bg-sky-500 text-white' : 'hover:bg-slate-700'}`}>Functional Equivalence</button>
                             </div>
                         </div>
-                        <div className="bg-slate-800 p-6 rounded-lg shadow-xl">
-                            <h3 className="text-xl font-bold text-sky-400 mb-4">Coordination Plan</h3>
-                            <div className="space-y-3">
-                               <div>
-                                    <h5 className="font-bold text-slate-300">Shared Outcome:</h5>
-                                    <p className="text-sm text-slate-400 p-2 bg-slate-700/50 rounded-md min-h-[2.5rem]">{sharedOutcome}</p>
-                               </div>
-                               <div>
-                                    <h5 className="font-bold text-slate-300">Contributions:</h5>
-                                    <p className="text-sm text-slate-400 mt-1"><strong>{personas.economic.name}:</strong> {contributions.economic}</p>
-                                    <p className="text-sm text-slate-400 mt-1"><strong>{personas.justice.name}:</strong> {contributions.justice}</p>
-                                    <p className="text-sm text-slate-400 mt-1"><strong>{personas.spiritual.name}:</strong> {contributions.spiritual}</p>
-                               </div>
-                               <p className="text-xs pt-4 text-slate-500">Notice you don't need to get them to agree on *why* the outcome is good; you only need to coordinate their actions toward achieving it. This is functional equivalence.</p>
+
+                        {/* Content based on approach */}
+                        {approach === 'traditional' ? (
+                            <div className="bg-slate-800 p-6 rounded-lg shadow-xl text-center">
+                                <h3 className="text-xl font-bold text-red-500">Outcome: Gridlock & Polarization</h3>
+                                <p className="mt-2 text-slate-400">In the traditional approach, each persona debates to prove their view is the "right" one. They talk past each other because they don't share the same recognition frames or values. The result is conflict, inaction, and increased division, as no single view can encompass the complexity of the problem.</p>
                             </div>
+                        ) : (
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                <div className="bg-slate-800 p-6 rounded-lg shadow-xl">
+                                    <h3 className="text-xl font-bold text-green-500 mb-4">Builder: Find Functional Equivalence</h3>
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="block font-semibold text-slate-300 mb-1">1. Identify a Shared Outcome</label>
+                                            <input type="text" value={sharedOutcome} onChange={e => setSharedOutcome(e.target.value)} placeholder="e.g., A thriving, sustainable world for future generations" className="w-full bg-slate-700 border border-slate-600 rounded-md px-3 py-2"/>
+                                        </div>
+                                        <div>
+                                            <label className="block font-semibold text-slate-300 mb-1">2. Map Each PRF's Contribution</label>
+                                            <p className="text-xs text-slate-400 mb-2">How can each group contribute to the shared outcome *from within their own worldview*?</p>
+                                            <textarea value={contributions.economic} onChange={e => updateContribution('economic', e.target.value)} rows="2" placeholder={`${personas.economic.name} can contribute by...`} className="w-full bg-slate-700 border border-slate-600 rounded-md px-3 py-2 mb-2"></textarea>
+                                            <textarea value={contributions.justice} onChange={e => updateContribution('justice', e.target.value)} rows="2" placeholder={`${personas.justice.name} can contribute by...`} className="w-full bg-slate-700 border border-slate-600 rounded-md px-3 py-2 mb-2"></textarea>
+                                            <textarea value={contributions.spiritual} onChange={e => updateContribution('spiritual', e.target.value)} rows="2" placeholder={`${personas.spiritual.name} can contribute by...`} className="w-full bg-slate-700 border border-slate-600 rounded-md px-3 py-2"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="bg-slate-800 p-6 rounded-lg shadow-xl">
+                                    <h3 className="text-xl font-bold text-sky-400 mb-4">Coordination Plan</h3>
+                                    <div className="space-y-3">
+                                       <div>
+                                            <h5 className="font-bold text-slate-300">Shared Outcome:</h5>
+                                            <p className="text-sm text-slate-400 p-2 bg-slate-700/50 rounded-md min-h-[2.5rem]">{sharedOutcome}</p>
+                                       </div>
+                                       <div>
+                                            <h5 className="font-bold text-slate-300">Contributions:</h5>
+                                            <p className="text-sm text-slate-400 mt-1"><strong>{personas.economic.name}:</strong> {contributions.economic}</p>
+                                            <p className="text-sm text-slate-400 mt-1"><strong>{personas.justice.name}:</strong> {contributions.justice}</p>
+                                            <p className="text-sm text-slate-400 mt-1"><strong>{personas.spiritual.name}:</strong> {contributions.spiritual}</p>
+                                       </div>
+                                       <p className="text-xs pt-4 text-slate-500">Notice you don't need to get them to agree on *why* the outcome is good; you only need to coordinate their actions toward achieving it. This is functional equivalence.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </ModuleContainer>
+            );
+        };
+
+
+        // --- Conclusion Module ---
+        const ConclusionModule = () => {
+            const concepts = [
+                { 
+                    title: "1. Emergence", 
+                    recap: "From the Game of Life and Traffic Sim, you saw complex, large-scale patterns (gliders, jams) form from simple, local rules.",
+                    insight: "The key insight is that macro-behavior is not a simple sum of its micro-parts. Order and structure can appear spontaneously without a central controller. This is the foundation of all complex systems."
+                },
+                { 
+                    title: "2. Recognition", 
+                    recap: "In the Recognition Challenge, the image wasn't truly 'in' the noise until your mind organized the dots into a meaningful pattern.",
+                    insight: "This demonstrated that we don't just see reality; we actively interpret it. Once you 'see' a pattern, you can't un-see it. This is your Personal Reality Framework (PRF) in action—an automatic, pattern-matching filter."
+                },
+                { 
+                    title: "3. Coordination Challenges", 
+                    recap: "The Schelling Model showed how collective segregation could emerge even when individuals had a high tolerance for diversity.",
+                    insight: "This reveals a critical truth: good individual intentions don't automatically lead to good group outcomes. Solving complex social problems requires understanding the *dynamics of the system*, not just individual motives."
+                },
+                { 
+                    title: "4. Self-Awareness (OS1 vs. OS2)", 
+                    recap: "The PRF Assessment prompted you to map your own framework by identifying what you recognize and tracing its history.",
+                    insight: "This is the process of moving from 'OS1' (reacting through your framework) to 'OS2' (observing your framework). You are not your PRF; you are the one who can see and question it. This self-awareness is the key to escaping your own biases."
+                },
+                { 
+                    title: "5. Coordinated Action", 
+                    recap: "Finally, the Functional Equivalence Builder challenged you to find a path forward between groups with clashing PRFs.",
+                    insight: "The master skill for navigating complexity is to stop arguing about who is 'right' and instead find a shared outcome that all groups can contribute to from within their own worldview. This allows for effective coordination without requiring total consensus."
+                }
+            ];
+
+            return (
+                <ModuleContainer
+                    title="The Synthesis: Tying It All Together"
+                    description="You've explored several powerful concepts. Here’s how they fit together to provide a new lens for understanding and acting in the world."
+                >
+                    <div className="max-w-3xl mx-auto space-y-6">
+                        {concepts.map((concept, index) => (
+                            <div key={index} className="bg-slate-800 p-6 rounded-lg shadow-xl">
+                                <h3 className="text-xl font-bold text-sky-400">{concept.title}</h3>
+                                <p className="mt-2 text-slate-300 italic"><strong>Recap:</strong> {concept.recap}</p>
+                                <p className="mt-3 text-slate-200"><strong>Key Insight:</strong> {concept.insight}</p>
+                            </div>
+                        ))}
+                        <div className="bg-slate-800 p-6 rounded-lg shadow-xl text-center">
+                            <h3 className="text-2xl font-bold text-green-400">Your Path Forward</h3>
+                            <p className="mt-4 text-slate-300">
+                                From the spontaneous order of <strong className="text-white">Emergence</strong>, you learned to see your own mental patterns in <strong className="text-white">Recognition</strong>. 
+                                Understanding these internal and external systems allows you to diagnose <strong className="text-white">Coordination Challenges</strong> and use <strong className="text-white">Self-Awareness (OS2)</strong> to build bridges through <strong className="text-white">Functional Equivalence</strong>.
+                            </p>
+                            <p className="mt-4 font-semibold">
+                                Continue practicing. Look for these patterns in your daily life. How can you apply these insights to a disagreement with a friend, a challenge at work, or a problem in your community?
+                            </p>
                         </div>
                     </div>
-                )}
-            </div>
-        </ModuleContainer>
-    );
-};
+                </ModuleContainer>
+            );
+        };
 
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
 
-// --- Conclusion Module ---
-const ConclusionModule = () => {
-    const concepts = [
-        { 
-            title: "1. Emergence", 
-            recap: "From the Game of Life and Traffic Sim, you saw complex, large-scale patterns (gliders, jams) form from simple, local rules.",
-            insight: "The key insight is that macro-behavior is not a simple sum of its micro-parts. Order and structure can appear spontaneously without a central controller. This is the foundation of all complex systems."
-        },
-        { 
-            title: "2. Recognition", 
-            recap: "In the Recognition Challenge, the image wasn't truly 'in' the noise until your mind organized the dots into a meaningful pattern.",
-            insight: "This demonstrated that we don't just see reality; we actively interpret it. Once you 'see' a pattern, you can't un-see it. This is your Personal Reality Framework (PRF) in action—an automatic, pattern-matching filter."
-        },
-        { 
-            title: "3. Coordination Challenges", 
-            recap: "The Schelling Model showed how collective segregation could emerge even when individuals had a high tolerance for diversity.",
-            insight: "This reveals a critical truth: good individual intentions don't automatically lead to good group outcomes. Solving complex social problems requires understanding the *dynamics of the system*, not just individual motives."
-        },
-        { 
-            title: "4. Self-Awareness (OS1 vs. OS2)", 
-            recap: "The PRF Assessment prompted you to map your own framework by identifying what you recognize and tracing its history.",
-            insight: "This is the process of moving from 'OS1' (reacting through your framework) to 'OS2' (observing your framework). You are not your PRF; you are the one who can see and question it. This self-awareness is the key to escaping your own biases."
-        },
-        { 
-            title: "5. Coordinated Action", 
-            recap: "Finally, the Functional Equivalence Builder challenged you to find a path forward between groups with clashing PRFs.",
-            insight: "The master skill for navigating complexity is to stop arguing about who is 'right' and instead find a shared outcome that all groups can contribute to from within their own worldview. This allows for effective coordination without requiring total consensus."
-        }
-    ];
-
-    return (
-        <ModuleContainer
-            title="The Synthesis: Tying It All Together"
-            description="You've explored several powerful concepts. Here’s how they fit together to provide a new lens for understanding and acting in the world."
-        >
-            <div className="max-w-3xl mx-auto space-y-6">
-                {concepts.map((concept, index) => (
-                    <div key={index} className="bg-slate-800 p-6 rounded-lg shadow-xl">
-                        <h3 className="text-xl font-bold text-sky-400">{concept.title}</h3>
-                        <p className="mt-2 text-slate-300 italic"><strong>Recap:</strong> {concept.recap}</p>
-                        <p className="mt-3 text-slate-200"><strong>Key Insight:</strong> {concept.insight}</p>
-                    </div>
-                ))}
-                <div className="bg-slate-800 p-6 rounded-lg shadow-xl text-center">
-                    <h3 className="text-2xl font-bold text-green-400">Your Path Forward</h3>
-                    <p className="mt-4 text-slate-300">
-                        From the spontaneous order of <strong className="text-white">Emergence</strong>, you learned to see your own mental patterns in <strong className="text-white">Recognition</strong>. 
-                        Understanding these internal and external systems allows you to diagnose <strong className="text-white">Coordination Challenges</strong> and use <strong className="text-white">Self-Awareness (OS2)</strong> to build bridges through <strong className="text-white">Functional Equivalence</strong>.
-                    </p>
-                    <p className="mt-4 font-semibold">
-                        Continue practicing. Look for these patterns in your daily life. How can you apply these insights to a disagreement with a friend, a challenge at work, or a problem in your community?
-                    </p>
-                </div>
-            </div>
-        </ModuleContainer>
-    );
-};
-
+    </script>
+</body>
+</html>
